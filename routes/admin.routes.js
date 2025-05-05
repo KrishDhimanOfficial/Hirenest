@@ -1,0 +1,74 @@
+import express from 'express'
+import adminControllers from '../controllers/admin.controller.js'
+import jobAttributesController from '../controllers/job.attributes.controller.js'
+import isAuthenticated from '../middleware/isAuthenticated.js'
+import passport from 'passport'
+import { upload } from '../middleware/multer.middleware.js'
+const router = express.Router()
+
+router.route('/login')
+    .get((req, res) => res.render('admin/login', { layout: false, title: 'Login' }))
+    .post((req, res, next) => {
+        passport.authenticate('local', (err, user, info) => {
+            if (err) return next(err)
+            if (!user) return res.status(401).render('admin/login', {
+                layout: false,
+                title: 'Login',
+                error: 'Incorrect Email & Password.'
+            })
+
+            req.logIn(user, (err) => {
+                if (err) return next(err)
+                return res.redirect('/dashboard')
+            })
+        })(req, res, next)
+    })
+
+router.use(isAuthenticated)
+router.get('/', adminControllers.renderDashboard)
+
+
+router.get('/job/category', adminControllers.renderJobCategory)
+router.route('/job-category/:id?')
+    .post(upload.none(), jobAttributesController.createJob_category)
+    .get(jobAttributesController.getSingle_job_category)
+    .put(upload.none(), jobAttributesController.updateJob_category)
+    .patch(jobAttributesController.updateJob_category_status)
+    .delete(jobAttributesController.deleteJob_category)
+
+router.get('/job/degree', adminControllers.renderJobDegree)
+router.route('/job-degree/:id?')
+    .post(upload.none(), jobAttributesController.createJob_degree)
+    .get(jobAttributesController.getSingleJob_degree)
+    .put(upload.none(), jobAttributesController.updateJob_degree)
+    .patch(jobAttributesController.updateJob_degree_status)
+    .delete(jobAttributesController.deleteJob_degree)
+
+router.get('/job/industry', adminControllers.renderJobIndustry)
+router.route('/job-industry/:id?')
+    .post(upload.none(), jobAttributesController.createJob_industry)
+    .get(jobAttributesController.getSingleJob_industry)
+    .put(upload.none(), jobAttributesController.updateJob_industry)
+    .patch(jobAttributesController.updateJob_industry_status)
+    .delete(jobAttributesController.deleteJob_industry)
+
+router.get('/job/tags', adminControllers.renderJobTag)
+router.route('/job-tag/:id?')
+    .post(upload.none(), jobAttributesController.createJob_tag)
+    .get(jobAttributesController.getSingleJob_tag)
+    .put(upload.none(), jobAttributesController.updateJob_tag)
+    .delete(jobAttributesController.deleteJob_tag)
+
+router.get('/job/types', adminControllers.renderJobType)
+router.route('/job-type/:id?')
+    .post(upload.none(), jobAttributesController.createJob_type)
+    .get(jobAttributesController.getSingleJob_type)
+    .put(upload.none(), jobAttributesController.updateJob_type)
+    .delete(jobAttributesController.deleteJob_type)
+
+router.get('/*', (req, res) => res.status(404).render('admin/partials/NotFound', {
+    layout: false,
+    title: '404'
+}))
+
+export default router

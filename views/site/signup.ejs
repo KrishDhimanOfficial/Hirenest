@@ -1,0 +1,46 @@
+<div class="signup-section pt-150 pb-150 pt-lg-120 pb-lg-90 pt-md-80 pb-md-50 pt-xs-50 pb-xs-20">
+    <div class="container">
+        <div class="row align-items-center justify-content-center">
+            <div class="col-lg-6">
+                <div class="signup-form">
+                    <div class="section-title text-center mb-50">
+                        <div class="title">
+                            <h2>Create Your Account</h2>
+                        </div>
+                    </div>
+                    <form id="submitForm">
+                        <div class="input-wrap mb-20">
+                            <input type="text" placeholder="name" name="name">
+                        </div>
+                        <div class="input-wrap mail mb-20">
+                            <input type="email" placeholder="Email Name" name="email">
+                        </div>
+                        <div class="input-wrap phone mb-20">
+                            <input type="text" placeholder="Phone Number" name="phone">
+                        </div>
+                        <div class="input-wrap pass mb-20">
+                            <input type="text" placeholder="Password" name="password">
+                        </div>
+                        <div class="input-wrap pass mb-20">
+                            <input type="text" placeholder="Confirm Password" name="confirmpassword">
+                            <input type="hidden" id="endapi" value="<%= endApi %>">
+                        </div>
+                        <div class="input-check mb-20">
+                            <input type="checkbox" name="isrecuiter">
+                            <span>is Recuriter</span>
+                        </div>
+                        <div class="input-check mb-20">
+                            <input type="checkbox">
+                            <span>I have read and agree to the Terms & Conditions</span>
+                        </div>
+                        <div class="col-12">
+                            <div class="submit-btn">
+                                <button id="submitFormBtn" class="signup-btn btn-1" type="submit">Submit Now</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

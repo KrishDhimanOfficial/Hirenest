@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        <% if (locals.title) {%>
+            <%= title %>
+                <% } %>
+    </title>
+    <!-- All CSS -->
+    <link rel="stylesheet" href="assets/css/animate.css">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/aos.css">
+    <link rel="stylesheet" href="assets/css/swiper-bundle.min.css">
+    <link rel="stylesheet" href="assets/css/slick.css">
+    <link rel="stylesheet" href="assets/css/nice-select.css">
+    <link rel="stylesheet" href="assets/css/odometer.css">
+    <link rel="stylesheet" href="assets/css/venobox.min.css">
+    <link rel="stylesheet" href="assets/css/spacing.css">
+    <link rel="stylesheet" href="assets/css/all.min.css">
+    <link rel="stylesheet" href="assets/vendor/toastr/toastr.min.css">
+    <link rel="stylesheet" href="assets/css/main.css">
+</head>
+
+<body>
+    <div class="main-page-wrapper">
+        <%- include('../site/partials/Loader') %>
+            <%- include('../site/partials/header') %>
+                <%- include('../site/partials/sidebar') %>
+                    <% if (title !=='Home' ) { %>
+                        <%- include('../site/partials/breadcrumb') %>
+                            <% } %>
+                                <%- body %>
+                                    <%- include('../site/partials/footer') %>
+    </div>
+    <script defer src="assets/vendor/jquery/jquery.min.js"></script>
+    <script defer src="assets/vendor/jquery-ui/jquery-ui.min.js"></script>
+    <script defer src="assets/js/popper.min.js"></script>
+    <script defer src="assets/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script defer src="assets/js/swiper-bundle.min.js"></script>
+    <script defer src="assets/js/slick.min.js"></script>
+    <script defer src="assets/js/wow.min.js"></script>
+    <script defer src="assets/js/aos.js"></script>
+    <script defer src="assets/js/jquery.nice-select.min.js"></script>
+    <script defer src="assets/js/odometer.min.js"></script>
+    <script defer src="assets/js/jquery-ui-slider-range.js"></script>
+    <script defer src="assets/js/jquery.appear.js"></script>
+    <script defer src="assets/js/venobox.min.js"></script>
+    <script defer src="assets/vendor/toastr/toastr.min.js"></script>
+    <script defer src="assets/js/script.js"></script>
+    <script defer src="assets/js/main.js" type="module"></script>
+</body>
+
+</html>
