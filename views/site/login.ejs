@@ -8,22 +8,26 @@
                             <h2>Log in Your Account</h2>
                         </div>
                     </div>
-                    <form method="post" action="/login" enctype="multipart/form-data">
+                    <form method="post" action="/login" autocomplete="off">
                         <div class="input-wrap mb-20">
-                            <input type="text" placeholder="Email">
+                            <input type="text" placeholder="Email" name="email">
                         </div>
                         <div class="input-wrap pass mb-20">
-                            <input type="text" placeholder="Password">
+                            <input type="text" placeholder="Password" name="password">
                         </div>
                         <div class="col-12">
-                            <div class="submit-btn">
-                                <button class="signup-btn btn-1" type="submit">Login Now</button>
-                                <div class="redirect-section text-center">
-                                    <p class="mt-40">Don’t have an account? <b><a href="/signup">Sign up
-                                                Today</a></b></p>
-                                    <h5 class="text-heading">Forgot password</h5>
+                            <% if (locals.error) { %>
+                                <div class="alert alert-danger text-center" role="alert">
+                                    <%= error %>
                                 </div>
-                            </div>
+                                <% } %>
+                                    <div class="submit-btn">
+                                        <button class="signup-btn btn-1" type="submit">Login Now</button>
+                                        <div class="redirect-section text-center">
+                                            <p class="mt-40">Don’t have an account? <b><a href="/signup">Sign
+                                                        upToday</a></b></p>
+                                        </div>
+                                    </div>
                         </div>
                     </form>
                 </div>

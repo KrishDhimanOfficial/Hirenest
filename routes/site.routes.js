@@ -3,28 +3,38 @@ import passport from 'passport'
 import siteControllers from '../controllers/site.controller.js'
 import usersControllers from '../controllers/users.controller.js'
 import { upload, userInfo } from '../middleware/multer.middleware.js'
+import { checkIsCandidate, checkIsRecruiter } from '../middleware/authentication.js'
 import handlemulterError from '../middleware/handleMulterErrors.js'
+import userProfileRoutes from './site.user.profile.routes.js'
+import recuriterProfileRoutes from './site.recriter.profile.routes.js'
 const router = express.Router()
 
 router.get('/', siteControllers.renderHomePage)
 router.route('/signup')
-    .get((req, res) => res.render('site/signup', { layout: 'layout/site', title: 'Signup', endApi: 'signup' }))
+    .get((req, res) => res.render('layout/site', { body: '../site/signup', title: 'Signup', endApi: 'signup' }))
     .post(upload.none(), usersControllers.createUser)
 
 router.route('/login')
-    .get((req, res) => res.render('site/login', { layout: 'layout/site', title: 'Login', endApi: 'login' }))
+    .get((req, res) => res.render('layout/site', { body: '../site/login', title: 'Login', endApi: 'login' }))
     .post((req, res, next) => {
         passport.authenticate('local', (err, user, info) => {
             if (err) return next(err)
-            if (!user) return res.status(401).render('site/login', {
-                layout: false,
+            if (!user) return res.status(401).render('layout/site', {
+                body: '../site/login',
                 title: 'Login',
                 error: 'Incorrect Email & Password.'
             })
 
             req.logIn(user, (err) => {
-                if (err) return next(err)
-                return res.redirect('/')
+                if (!user.isactive) return res.render('layout/site',
+                    {
+                        body: '../site/login',
+                        title: 'Login',
+                        endApi: 'login',
+                        error: 'Your Account is Deactive.'
+                    }
+                )
+                user.isrecuiter ? res.redirect('/recruiter') : res.redirect('/profile')
             })
         })(req, res, next)
     })
@@ -41,9 +51,11 @@ router.route('/user/:id?')
         usersControllers.updateuserInfo)
     .delete(usersControllers.deleteuserInfo)
 
-// router.route('/user/project/:id?')
-router.get('/*', (req, res) => res.status(404).render('site/partials/error', {
-    layout: 'layout/site',
+router.use('/profile', checkIsCandidate, userProfileRoutes)
+router.use('/recruiter', checkIsRecruiter, recuriterProfileRoutes)
+
+router.get('/*', (req, res) => res.status(404).render('layout/site', {
+    body: '../site/partials/error',
     title: '404'
 }))
 

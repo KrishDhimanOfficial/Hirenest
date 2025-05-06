@@ -8,14 +8,16 @@ import Fetch from './fetch.js'
 export const Notify = (data) => {
     if (data.success) toastr.success(data.success)
     if (data.warning) toastr.warning(data.warning)
+    if (data.info) toastr.warning(data.info)
     if (data.error) toastr.error(data.error)
+    if (data.redirect) window.location.href = data.redirect
     if (data.errors) data.errors.forEach(error => toastr.error(error))
     return;
 }
 
 export const updatetableDataStatus = async (status, api) => {
     try {
-        const res = await Fetch.patch(api, { status })
+        const res = await Fetch.patch(api, { status }, { 'Content-Type': 'application/json' })
         Notify(res)
     } catch (error) {
         console.error(error)

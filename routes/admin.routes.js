@@ -1,9 +1,10 @@
 import express from 'express'
 import adminControllers from '../controllers/admin.controller.js'
 import jobAttributesController from '../controllers/job.attributes.controller.js'
-import isAuthenticated from '../middleware/isAuthenticated.js'
+import { isAuthenticated } from '../middleware/authentication.js'
 import passport from 'passport'
 import { upload } from '../middleware/multer.middleware.js'
+import usersControllers from '../controllers/users.controller.js'
 const router = express.Router()
 
 router.route('/login')
@@ -66,9 +67,22 @@ router.route('/job-type/:id?')
     .put(upload.none(), jobAttributesController.updateJob_type)
     .delete(jobAttributesController.deleteJob_type)
 
+// site users
+router.get('/users', adminControllers.renderUsers)
+router.patch('/user/:id', usersControllers.updateUserActiveStatus)
+router.delete('/user/:id', usersControllers.deleteuserInfo)
+
+//settings
+router.get('/setting/term&condition', adminControllers.renderTerms_CondtionPage)
+
 router.get('/*', (req, res) => res.status(404).render('admin/partials/NotFound', {
     layout: false,
     title: '404'
 }))
+
+
+// router.use((err, req, res, next) => {
+//     return res.status(404).redirect('/dashboard/login')
+// })
 
 export default router

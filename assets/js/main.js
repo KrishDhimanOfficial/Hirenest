@@ -2,9 +2,8 @@ import { Form, Notify, TextINput, submitFormBtn, datatable, deletebtn, handleDel
 import Fetch from './fetch.js'
 
 const apiInput = document.querySelector('#endapi')
-const datatable = document.querySelector("#datatable")
-
-if (datatable) $("#datatable").DataTable({
+if (document.querySelector('.select2')) $('.select2').select2()
+if (document.querySelector("#datatable")) $("#datatable").DataTable({
     "paging": true,
     "lengthChange": false,
     "searching": true,
@@ -14,10 +13,10 @@ if (datatable) $("#datatable").DataTable({
     "responsive": true,
 })
 
-
 window.onload = () => {
     if (window.location.pathname === '/dashboard') Notify({ success: 'Welcome to HireNest' })
 }
+
 
 if (datatable) datatable.onclick = (e) => {
     const endApi = `/${apiInput.value.trim()}/${e.target.dataset.id}`;

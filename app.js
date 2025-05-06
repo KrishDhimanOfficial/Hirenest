@@ -4,13 +4,13 @@ import logger from 'morgan'
 import cors from 'cors'
 import helmet from 'helmet'
 import compression from 'compression'
-import expressLayouts from 'express-ejs-layouts'
+import MongoStore from 'connect-mongo';
 import rateLimit from 'express-rate-limit'
 import mongoSanitize from 'express-mongo-sanitize'
 import xss from 'xss-clean'
+import path from 'path'
 import passport from 'passport'
 import session from 'express-session'
-import flash from 'connect-flash'
 import siteRoutes from './routes/site.routes.js'
 import adminRoutes from './routes/admin.routes.js'
 import passportconfig from './services/passportconfig.js'
@@ -41,8 +41,8 @@ app.use(compression(
 ))
 app.use(rateLimit(
   {
-    windowMs: 1000, // 15 mins
-    max: 10, // limit each IP
+    windowMs: 1000, // 1 mins
+    max: 100, // limit each IP
     message: 'Too many requests. Please try again later.'
   }
 ))
@@ -50,36 +50,32 @@ app.use(rateLimit(
 app.use(mongoSanitize())
 app.use(xss())
 app.use(logger('dev'))
-app.use(cookieParser())
-app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
+app.use(express.json())
+app.use(cookieParser())
 app.use(session(
   {
     secret: config.securityKey,
     resave: false,
     saveUninitialized: false,
-    cookie: {
-      maxAge: 60 * 60 * 1000 // 1 hour in milliseconds
-    }
+    cookie: { maxAge: 3600000 }, // 1 hour
+    store: MongoStore.create({ mongoUrl: config.mongoDB_URL })
   }
 ))
-app.use(flash())
+passportconfig(passport)
 app.use(passport.initialize())
 app.use(passport.session())
-passportconfig(passport)
 
 // view engine setup
-app.set('views', app.use('/views', express.static('views')))
+app.set('views', path.join(process.cwd(), 'views'))
 app.set('view engine', 'ejs')
-app.set('views', 'views')
-app.use(expressLayouts)
 
 // folder setup
 app.set('assets', app.use('/assets', express.static('assets')))
 
 // routes 
-app.use('/', siteRoutes)
 app.use('/dashboard', adminRoutes)
+app.use('/', siteRoutes)
 
 
 app.use((err, req, res, next) => {

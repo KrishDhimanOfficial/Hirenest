@@ -9,10 +9,11 @@ export default function (passport) {
     }, async (email, password, done) => {
         try {
             const user = await userModel.findOne({ email })
-            if (!user) return done(null, false, { message: 'User not found' });
+
+            if (!user) return done(null, false, { error: 'User not found' });
 
             const match = await bcrypt.compare(password, user.password);
-            if (!match) return done(null, false, { message: 'Incorrect password' })
+            if (!match) return done(null, false, { error: 'Incorrect password' })
 
             return done(null, user)
         } catch (err) {
@@ -20,12 +21,14 @@ export default function (passport) {
         }
     }))
 
-    passport.serializeUser((user, done) => {
-        done(null, user._id);
-    });
+    passport.serializeUser((user, done) => { done(null, user._id) })
 
-    passport.deserializeUser(async (id, done) => {
-        const user = await userModel.findById({_id:id})
-        done(null, user)
+    passport.deserializeUser(async (_id, done) => {
+        try {
+            const user = await userModel.findById(_id)
+            done(null, user)
+        } catch (err) {
+            done(err)
+        }
     })
 }

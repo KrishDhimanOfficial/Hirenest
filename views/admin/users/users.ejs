@@ -1,0 +1,80 @@
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-md-6">
+                <h1 class="mb-2">Users</h1>
+                <ol class="breadcrumb float-sm-left">
+                    <li class="breadcrumb-item"><a href="/dashboard">Home</a></li>
+                    <li class="breadcrumb-item active">users</li>
+                </ol>
+            </div>
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <table id="datatable" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <!-- <th><input type="checkbox" id="selectAll"></th> -->
+                                    <th>S.No</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>IsActive</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-grid">
+                                <% users?.forEach((user,i)=> { %>
+                                    <tr class="table-row">
+                                        <!-- <td>
+                                            <input type="checkbox" data-id="<%# user._id %>" class="rowCheckbox">
+                                        </td> -->
+                                        <td>
+                                            <%= i + 1 %>
+                                        </td>
+                                        <td>
+                                            <%= user.name %>
+                                        </td>
+                                        <td>
+                                            <%= user.email %>
+                                        </td>
+                                        <td>
+                                            <%= user.isrecuiter ? 'Recruiter' : 'Candidate' %>
+                                        </td>
+                                        <td>
+                                            <label class="switch">
+                                                <input type="checkbox" data-id="<%= user._id %>" class="status rowId"
+                                                    <%=user.isactive ? 'checked' :'' %> >
+                                                <span class="slider"></span>
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex gap-2">
+                                                <button type="button" data-bs-toggle="modal"
+                                                    data-bs-target="#modal-danger" data-id="<%= user._id %>"
+                                                    class="btn btn-danger btn-default m-0 danger-modal rowId">
+                                                    <i class="fa-solid fa-trash" data-id="<%= user._id %>"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<input type="hidden" id="endapi" value="<%= endApi %>">

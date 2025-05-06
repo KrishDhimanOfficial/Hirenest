@@ -1,5 +1,4 @@
 import userModel from "../models/user.model.js"
-import { setUser, getUser } from "../services/auth.js"
 import bcrypt from 'bcrypt'
 import validate from "../services/validate.js"
 import userProjectModel from "../models/user.project.model.js"
@@ -9,10 +8,12 @@ const validateId = mongoose.Types.ObjectId.isValid;
 const usersControllers = {
     createUser: async (req, res) => {
         try {
-            console.log(req.body);
-
-            const { name, email, password, confirmpassword, phone, isrecuiter } = req.body;
+            const { name, email, password, confirmpassword, phone, isrecuiter, term_condition } = req.body;
             if (password !== confirmpassword) return res.status(400).json({ error: "Password dosen't Match." })
+
+            const checkFields = !name || !email || !password || !phone || !isrecuiter;
+            if (checkFields) return res.status(400).json({ info: "All Fields Required." })
+            if (!term_condition) return res.status(400).json({ info: "Read Term & Condition." })
 
             const checkExstence = await userModel.findOne({ email })
             if (checkExstence) return res.status(400).json({ error: "Email is already in use." })
@@ -23,7 +24,7 @@ const usersControllers = {
                 isrecuiter: isrecuiter ? true : false
             })
             if (!response) return res.status(400).json({ error: 'Something went wrong, please try again later.' })
-            return res.status(200).json({ success: 'Item created successfully.' })
+            return res.status(200).json({ redirect: '/login' })
         } catch (error) {
             if (error.name === 'ValidationError') validate(res, error.errors)
             console.log('createUser : ' + error.message)
@@ -65,6 +66,18 @@ const usersControllers = {
         } catch (error) {
             if (error.name === 'ValidationError') validate(res, error.errors)
             console.log('updateuserInfo : ' + error.message)
+        }
+    },
+    updateUserActiveStatus: async (req, res) => {
+        try {
+            if (!validateId(req.params.id)) return res.status(400).json({ error: 'Invalid Request.' })
+            const { status } = req.body;
+
+            const response = await userModel.findByIdAndUpdate({ _id: req.params.id }, { isactive: status })
+            if (!response) return res.status(400).json({ error: 'Something went wrong, please try again later.' })
+            return res.status(200).json({ success: 'updated successfully.' })
+        } catch (error) {
+            console.log('updateUserActiveStatus : ' + error.message)
         }
     },
     deleteuserInfo: async (req, res) => {

@@ -9,12 +9,10 @@ import handleAggregatePagination from "../services/handlepagePagination.js"
 const adminControllers = {
     renderDashboard: async (req, res) => {
         try {
-            return res.render('admin/dashboard',
-                {
-                    layout: 'layout/admin',
-                    title: 'Dashboard'
-                }
-            )
+            return res.render('layout/admin', {
+                title: 'Hirenest | Dashboard',
+                body: '../admin/dashboard',
+            })
         } catch (error) {
             console.log('renderDashboard : ' + error.message)
         }
@@ -22,10 +20,10 @@ const adminControllers = {
     renderJobDegree: async (req, res) => {
         try {
             const response = await jobDegreeModel.find({})
-            return res.render('admin/jobdegree/degree',
+            return res.render('layout/admin',
                 {
-                    layout: 'layout/admin',
-                    title: 'Dashboard',
+                    body: '../admin/jobdegree/degree',
+                    title: 'Hirenest | Dashboard',
                     degrees: response,
                     endApi: 'dashboard/job-degree'
                 }
@@ -37,10 +35,10 @@ const adminControllers = {
     renderJobCategory: async (req, res) => {
         try {
             const response = await jobCategoryModel.find({})
-            return res.render('admin/jobcategory/category',
+            return res.render('layout/admin',
                 {
-                    layout: 'layout/admin',
-                    title: 'Dashboard',
+                    body: '../admin/jobcategory/category',
+                    title: 'Hirenest | Dashboard',
                     categories: response,
                     endApi: 'dashboard/job-category'
                 }
@@ -52,10 +50,10 @@ const adminControllers = {
     renderJobIndustry: async (req, res) => {
         try {
             const response = await jobIndustryTypeModel.find({})
-            return res.render('admin/jobindustry/industry',
+            return res.render('layout/admin',
                 {
-                    layout: 'layout/admin',
-                    title: 'Dashboard',
+                    body: '../admin/jobindustry/industry',
+                    title: 'Hirenest | Dashboard',
                     industries: response,
                     endApi: 'dashboard/job-industry'
                 }
@@ -68,10 +66,10 @@ const adminControllers = {
     renderJobTag: async (req, res) => {
         try {
             const response = await jobTagModel.find({})
-            return res.render('admin/jobtags/tags',
+            return res.render('layout/admin',
                 {
-                    layout: 'layout/admin',
-                    title: 'Dashboard',
+                    body: '../admin/jobtags/tags',
+                    title: 'Hirenest | Dashboard',
                     tags: response,
                     endApi: 'dashboard/job-tag'
                 }
@@ -83,16 +81,46 @@ const adminControllers = {
     renderJobType: async (req, res) => {
         try {
             const response = await jobTypeModel.find({})
-            return res.render('admin/jobtypes/jobtypes',
+            return res.render('layout/admin',
                 {
-                    layout: 'layout/admin',
-                    title: 'Dashboard',
+                    body: '../admin/jobtypes/jobtypes',
+                    title: 'Dashboard | JobType',
                     jobtypes: response,
                     endApi: 'dashboard/job-type'
                 }
             )
         } catch (error) {
             console.log('renderJobType : ' + error.message)
+        }
+    },
+    renderTerms_CondtionPage: async (req, res) => {
+        try {
+        } catch (error) {
+            console.log('renderTerms_CondtionPage : ' + error.message)
+        }
+    },
+    renderUsers: async (req, res) => {
+        try {
+            const response = await userModel.find({ role: { $ne: 'admin' } },
+                {
+                    _id: 1,
+                    name: 1,
+                    isactive: 1,
+                    email: 1,
+                    isrecuiter: 1
+                }
+            )
+
+            return res.render('layout/admin',
+                {
+                    body: '../admin/users/users',
+                    title: 'Dashboard | Users',
+                    users: response,
+                    endApi: 'dashboard/user'
+                }
+            )
+        } catch (error) {
+            console.log('renderUsers : ' + error.message)
         }
     },
 }
