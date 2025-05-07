@@ -67,6 +67,14 @@ router.route('/job-type/:id?')
     .put(upload.none(), jobAttributesController.updateJob_type)
     .delete(jobAttributesController.deleteJob_type)
 
+router.get('/job/skills', adminControllers.renderJobSkills)
+router.route('/job-skill/:id?')
+    .post(upload.none(), jobAttributesController.createJob_Skill)
+    .get(jobAttributesController.getSingleJob_Skill)
+    .put(upload.none(), jobAttributesController.updateJob_Skill)
+    .patch(jobAttributesController.updatejob_skillStatus)
+    .delete(jobAttributesController.deleteJob_skill)
+
 // site users
 router.get('/users', adminControllers.renderUsers)
 router.patch('/user/:id', usersControllers.updateUserActiveStatus)

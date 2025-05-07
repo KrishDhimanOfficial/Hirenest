@@ -56,7 +56,10 @@ const userSchema = new mongoose.Schema({
 
     url: {
         type: String,
-        match: [/^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-._~:/?#[\]@!$&'()*+,;=]*)?$/, 'Invalid URL.'],
+        match: [
+            /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[a-zA-Z0-9-_%]+\/?$/,
+            'Invalid LinkedIn profile URL.'
+        ],
         trim: true
     },
 

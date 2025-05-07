@@ -3,6 +3,9 @@ import bcrypt from 'bcrypt'
 import validate from "../services/validate.js"
 import userProjectModel from "../models/user.project.model.js"
 import mongoose from "mongoose";
+import deleteFile from '../services/deleteFile.js'
+
+const ObjectId = mongoose.Types.ObjectId;
 const validateId = mongoose.Types.ObjectId.isValid;
 
 const usersControllers = {
@@ -11,7 +14,7 @@ const usersControllers = {
             const { name, email, password, confirmpassword, phone, isrecuiter, term_condition } = req.body;
             if (password !== confirmpassword) return res.status(400).json({ error: "Password dosen't Match." })
 
-            const checkFields = !name || !email || !password || !phone || !isrecuiter;
+            const checkFields = !name || !email || !password || !phone;
             if (checkFields) return res.status(400).json({ info: "All Fields Required." })
             if (!term_condition) return res.status(400).json({ info: "Read Term & Condition." })
 
@@ -43,12 +46,18 @@ const usersControllers = {
     },
     updateuserInfo: async (req, res) => {
         try {
-            const { name, phone, gender, address, country, state, city, bio, url } = req.body;
-            if (!validateId(req.params.id)) return res.status(400).json({ error: 'Invalid Request.' })
+            const { name, phone, gender, address, skills, country, state, city, bio, url } = req.body;
+
+            if (!name || !phone || !gender || !address || !country || !state || !city || !bio || !url) {
+                return res.status(400).json({ info: "All Fields Required." })
+            }
+            if (skills.length > 10) return res.status(400).json({ info: "Skills can't be more than 10" })
+            if (skills.length <= 1) return res.status(400).json({ info: 'Select Atleast 2-3 Skills.' })
 
             const docToBeupdate = {
                 name, phone, gender,
                 location: { address, country, state, city },
+                skills: skills.map(id => new ObjectId(id)),
                 bio, url
             }
 
@@ -56,7 +65,7 @@ const usersControllers = {
             if (req.files['resume']) docToBeupdate.resume = req.files['resume'][0].filename
 
             const response = await userModel.findByIdAndUpdate(
-                { _id: req.params.id },
+                { _id: req.user?._id },
                 docToBeupdate,
                 { new: true, runValidators: true }
             )
@@ -65,6 +74,8 @@ const usersControllers = {
             return res.status(200).json({ success: 'updated.' })
         } catch (error) {
             if (error.name === 'ValidationError') validate(res, error.errors)
+            if (req.files['image']) deleteFile(`userInfo/${req.files['image'][0].filename}`)
+            if (req.files['resume']) deleteFile(`userInfo/${req.files['resume'][0].filename}`)
             console.log('updateuserInfo : ' + error.message)
         }
     },

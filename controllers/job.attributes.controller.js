@@ -7,6 +7,7 @@ import jobIndustryTypeModel from "../models/job.industry.type.model.js";
 import jobTypeModel from "../models/job.type.model.js";
 import jobTagModel from "../models/job.tag.model.js";
 import mongoose from "mongoose";
+import skillModel from "../models/skill.model.js";
 const validateId = mongoose.Types.ObjectId.isValid;
 
 const jobAttributesController = {
@@ -400,6 +401,87 @@ const jobAttributesController = {
             return res.status(200).json({ success: 'Deleted successfully.' })
         } catch (error) {
             console.log('deleteJob_tag : ' + error.message)
+        }
+    },
+    renderJobSkills: async (req, res) => {
+        try {
+            if (req.params.id.length !== 24) return res.status(400).json({ error: 'Invalid Request.' })
+            const checkExstence = await model.findOne({ name })
+            if (checkExstence) return res.status(400).json({ error: `Exists.` })
+            const response = await model;
+            if (!response) return res.status(400).json({ error: 'Something went wrong, please try again later.' })
+            return res.status(200).json({ success: 'updated successfully.' })
+        } catch (error) {
+            console.log(' renderJobSkills : ' + error.message)
+        }
+    },
+    createJob_Skill: async (req, res) => {
+        try {
+            const { name } = req.body;
+
+            const checkExstence = await skillModel.findOne({ name })
+            if (checkExstence) return res.status(400).json({ error: `${name} Exists.` })
+
+            const response = await skillModel.create({ name })
+            if (!response) return res.status(400).json({ error: 'Something went wrong, please try again later.' })
+            return res.status(200).json({ success: 'updated successfully.' })
+        } catch (error) {
+            if (error.name === 'ValidationError') validate(res, error.errors)
+            console.log('createJob_Skill : ' + error.message)
+        }
+    },
+    getSingleJob_Skill: async (req, res) => {
+        try {
+            if (!validateId(req.params.id)) return res.status(400).json({ error: 'Invalid Request.' })
+
+            const response = await skillModel.findById({ _id: req.params.id })
+            if (!response) return res.status(404).json({ error: 'Not Found.' })
+            return res.status(200).json(response)
+        } catch (error) {
+            console.log('getSingleJob_Skill : ' + error.message)
+        }
+    },
+    updateJob_Skill: async (req, res) => {
+        try {
+            if (!validateId(req.params.id)) return res.status(400).json({ error: 'Invalid Request.' })
+            const { name } = req.body;
+
+            const response = await skillModel.findByIdAndUpdate(
+                { _id: req.params.id },
+                { name },
+                { new: true, runValidators: true }
+            )
+            if (!response) return res.status(400).json({ error: 'Something went wrong, please try again later.' })
+            return res.status(200).json({ success: 'updated successfully.' })
+        } catch (error) {
+            if (error.name === 'ValidationError') validate(res, error.errors)
+            console.log('updateJob_Skill : ' + error.message)
+        }
+    },
+    updatejob_skillStatus: async (req, res) => {
+        try {
+            if (!validateId(req.params.id)) return res.status(400).json({ error: 'Invalid Request.' })
+            const { status } = req.body;
+
+            const response = await skillModel.findByIdAndUpdate({ _id: req.params.id },
+                { status },
+                { new: true, runValidators: true }
+            )
+            if (!response) return res.status(400).json({ error: 'Something went wrong, please try again later.' })
+            return res.status(200).json({ success: 'updated successfully.' })
+        } catch (error) {
+            console.log('updatejob_skillStatus : ' + error.message)
+        }
+    },
+    deleteJob_skill: async (req, res) => {
+        try {
+            if (!validateId(req.params.id)) return res.status(400).json({ error: 'Invalid Request.' })
+
+            const response = await skillModel.findByIdAndDelete({ _id: req.params.id })
+            if (!response) return res.status(400).json({ error: 'Something went wrong, please try again later.' })
+            return res.status(200).json({ success: 'Deleted successfully.' })
+        } catch (error) {
+            console.log('deleteJob_skill : ' + error.message)
         }
     },
 }

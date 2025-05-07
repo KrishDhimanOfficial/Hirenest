@@ -39,7 +39,7 @@ router.route('/login')
         })(req, res, next)
     })
 
-router.route('/user/:id?')
+router.route('/api/user')
     .get(usersControllers.getuserInfo)
     .put(userInfo.fields(
         [
@@ -50,6 +50,15 @@ router.route('/user/:id?')
         handlemulterError,
         usersControllers.updateuserInfo)
     .delete(usersControllers.deleteuserInfo)
+
+
+// Location API 
+router.get('/api/countries', siteControllers.getCounteries)
+router.get('/api/states', siteControllers.getStates)
+router.get('/api/cities', siteControllers.getcities)
+
+// Job skills
+router.get('/api/job-skills', siteControllers.getSkills)
 
 router.use('/profile', checkIsCandidate, userProfileRoutes)
 router.use('/recruiter', checkIsRecruiter, recuriterProfileRoutes)

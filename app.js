@@ -58,7 +58,7 @@ app.use(session(
     secret: config.securityKey,
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 3600000 }, // 1 hour
+    cookie: { maxAge: 4 * 60 * 60 * 1000 }, // 4 hour
     store: MongoStore.create({ mongoUrl: config.mongoDB_URL })
   }
 ))

@@ -17,6 +17,7 @@ class Fetch {
     }
 
     async get(endURL, headers, signal) {
+        // console.log('Starting fetch:',endURL)
         const finalHeaders = {
             ...(headers || {})
         }
@@ -25,6 +26,10 @@ class Fetch {
             headers: finalHeaders,
             signal: signal
         })
+        
+        // signal?.addEventListener('abort', () => {
+        //     console.log('Fetch aborted:',endURL)
+        // })
         return await res.json()
     }
 

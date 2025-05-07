@@ -3,6 +3,7 @@ import jobDegreeModel from "../models/job.degree.model.js";
 import jobIndustryTypeModel from "../models/job.industry.type.model.js";
 import jobTagModel from "../models/job.tag.model.js";
 import jobTypeModel from "../models/job.type.model.js";
+import skillModel from "../models/skill.model.js";
 import userModel from "../models/user.model.js";
 import handleAggregatePagination from "../services/handlepagePagination.js"
 
@@ -121,6 +122,21 @@ const adminControllers = {
             )
         } catch (error) {
             console.log('renderUsers : ' + error.message)
+        }
+    },
+    renderJobSkills: async (req, res) => {
+        try {
+            const response = await skillModel.find({})
+            return res.render('layout/admin',
+                {
+                    body: '../admin/jobskills/skills',
+                    title: 'Dashboard | Job Skills',
+                    skills: response,
+                    endApi: 'dashboard/job-skill'
+                }
+            )
+        } catch (error) {
+            console.log('renderJobSkills : ' + error.message)
         }
     },
 }

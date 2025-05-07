@@ -3,6 +3,7 @@ export const submitFormBtn = document.querySelector('#submitFormBtn')
 export const datatable = document.querySelector('#table-grid')
 export const deletebtn = document.querySelector('#deleteobjbtn')
 export const TextINput = document.querySelector('#TextINput')
+export const siteForm = document.querySelector('#updateFormSite')
 import Fetch from './fetch.js'
 
 export const Notify = (data) => {
@@ -15,6 +16,12 @@ export const Notify = (data) => {
     return;
 }
 
+export const updatetableData = async (api) => {
+    Form.id = 'updateForm';
+    const res = await Fetch.get(api)
+    Form.dataset.id = res._id;
+    TextINput.value = res.name;
+}
 export const updatetableDataStatus = async (status, api) => {
     try {
         const res = await Fetch.patch(api, { status }, { 'Content-Type': 'application/json' })
