@@ -1,0 +1,49 @@
+<div class="checkout-section <%= padding ? 'pt-150 pt-lg-120 pb-130 pb-lg-70' : 'px-4 py-0' %>">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3 ms-auto signup-form">
+                <div class="submit-btn">
+                    <button id="addproject" type="submit" class="signup-btn btn-1">Add</button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                projects
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="openprojectmodal" tabindex="-1" aria-labelledby="openprojectmodal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="updateFormSite" class="checkout-form">
+                <div class="row">
+                    <div class="col-12 <%= margin ? 'mx-auto' : 'm-0' %> ">
+                        <div class="col-12 mb-3">
+                            <label>Skills</label>
+                            <select id="jobskills" multiple class="single-input-wrapper select2" name="skills"
+                                style="width: 100%;">
+                            </select>
+                        </div>
+                        <div class="col-lg-6">
+                            <label>Email Id</label>
+                            <input type="email" placeholder="Email Address*" name="email" class="single-input-wrapper">
+                        </div>
+                        <div class="col-12 other-note-area">
+                            <label>Bio</label>
+                            <textarea placeholder="bio" name="bio" spellcheck="false"></textarea>
+                        </div>
+                        <div class="col signup-form">
+                            <div class="submit-btn">
+                                <Button id="submitFormBtn" type="submit" class="signup-btn btn-1">Submit</Button>
+                            </div>
+                        </div>
+                    </div> <!-- /.row -->
+                </div> <!-- /.user-profile-data -->
+        </div>
+    </div>
+    </form>
+</div>
+</div>
+</div>

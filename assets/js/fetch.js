@@ -26,7 +26,7 @@ class Fetch {
             headers: finalHeaders,
             signal: signal
         })
-        
+
         // signal?.addEventListener('abort', () => {
         //     console.log('Fetch aborted:',endURL)
         // })
@@ -52,7 +52,7 @@ class Fetch {
         const res = await fetch(`${this.ClientAPI}${endURL}`, {
             method: 'PATCH',
             headers: finalHeaders,
-            body: JSON.stringify(data)
+            body: headers.patch ? data : JSON.stringify(data)
         })
         return await res.json()
     }

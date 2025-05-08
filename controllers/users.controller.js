@@ -4,7 +4,7 @@ import validate from "../services/validate.js"
 import userProjectModel from "../models/user.project.model.js"
 import mongoose from "mongoose";
 import deleteFile from '../services/deleteFile.js'
-
+import ZipFile from "../services/ZipFile.js";
 const ObjectId = mongoose.Types.ObjectId;
 const validateId = mongoose.Types.ObjectId.isValid;
 
@@ -48,11 +48,12 @@ const usersControllers = {
         try {
             const { name, phone, gender, address, skills, country, state, city, bio, url } = req.body;
 
+            if (skills.length > 10) return res.status(400).json({ info: "Skills can't be more than 10" })
             if (!name || !phone || !gender || !address || !country || !state || !city || !bio || !url) {
+                deleteFile(`userInfo/${req.files['image'][0].filename}`)
+                deleteFile(`userInfo/${req.files['resume'][0].filename}`)
                 return res.status(400).json({ info: "All Fields Required." })
             }
-            if (skills.length > 10) return res.status(400).json({ info: "Skills can't be more than 10" })
-            if (skills.length <= 1) return res.status(400).json({ info: 'Select Atleast 2-3 Skills.' })
 
             const docToBeupdate = {
                 name, phone, gender,
@@ -62,21 +63,43 @@ const usersControllers = {
             }
 
             if (req.files['image']) docToBeupdate.image = req.files['image'][0].filename
-            if (req.files['resume']) docToBeupdate.resume = req.files['resume'][0].filename
+            if (req.files['resume']) docToBeupdate.resume = req.files['resume'][0].filename.replace('.pdf', '.zip')
 
             const response = await userModel.findByIdAndUpdate(
                 { _id: req.user?._id },
                 docToBeupdate,
-                { new: true, runValidators: true }
+                { runValidators: true }
             )
-            // TODO : add a function to delete candidate pdf and image
+
             if (!response) return res.status(404).json({ error: 'Something went wrong, please try again later.' })
-            return res.status(200).json({ success: 'updated.' })
+
+            await deleteFile(`userInfo/${response.image}`)
+            await deleteFile(`userInfo/${response.resume}`)
+            ZipFile(req, res) // Zip the pdf file
+
+            return res.status(200).json({ redirect: `/profile/${req.user?.name}` })
         } catch (error) {
             if (error.name === 'ValidationError') validate(res, error.errors)
             if (req.files['image']) deleteFile(`userInfo/${req.files['image'][0].filename}`)
             if (req.files['resume']) deleteFile(`userInfo/${req.files['resume'][0].filename}`)
             console.log('updateuserInfo : ' + error.message)
+            return res.status(500).json({ error: 'Something went wrong, please try again later.' })
+        }
+    },
+    updateUserPassword: async (req, res) => {
+        try {
+            const { password, confirm_password } = req.body;
+            if (password !== confirm_password) return res.status(400).json({ error: 'Passwords do not match.' })
+
+            const response = await userModel.findByIdAndUpdate(
+                { _id: req.user?._id },
+                { password: await bcrypt.hash(password, 10) },
+                { new: true }
+            )
+            if (!response) return res.status(400).json({ error: 'Something went wrong, please try again later.' })
+            return res.status(200).json({ success: 'Password Changed.' })
+        } catch (error) {
+            console.log('updateUserPassword : ' + error.message)
         }
     },
     updateUserActiveStatus: async (req, res) => {
@@ -93,12 +116,12 @@ const usersControllers = {
     },
     deleteuserInfo: async (req, res) => {
         try {
-            if (!validateId(req.params.id)) return res.status(400).json({ error: 'Invalid Request.' })
-
-            const response = await userModel.findByIdAndDelete({ _id: req.params.id })
-            // TODO : add a function to delete candidate pdf and image
+            const response = await userModel.findByIdAndDelete({ _id: req.user?._id }, { new: true })
             if (!response) return res.status(404).json({ error: 'Not Found.' })
-            return res.status(200).json({ success: 'Deleted successfully.' })
+
+            await deleteFile(`userInfo/${response.image}`)
+            await deleteFile(`userInfo/${response.resume}`)
+            return res.status(200).json({ redirect: '/login' })
         } catch (error) {
             console.log('deleteuserInfo : ' + error.message)
         }

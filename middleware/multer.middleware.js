@@ -30,10 +30,10 @@ const filterUserInfo = (req, file, cb) => {
     file.stream?.on('data', chunk => {
         file._size = (file._size || 0) + chunk.length;
 
-        const condition = (file.fieldname === 'image' && file._size > imageMaxSize) ||
+        const checkDocs = (file.fieldname === 'image' && file._size > imageMaxSize) ||
             (file.fieldname === 'resume' && file._size > resumeMaxSize)
-        if (condition) {
-            cb(
+        if (checkDocs) {
+            return cb(
                 new multer.MulterError('LIMIT_FILE_SIZE', `${file.fieldname} exceeds size limit`),
                 false
             )

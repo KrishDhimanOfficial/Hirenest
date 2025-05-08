@@ -71,6 +71,7 @@ app.set('views', path.join(process.cwd(), 'views'))
 app.set('view engine', 'ejs')
 
 // folder setup
+app.use('/uploads', express.static('uploads'))
 app.set('assets', app.use('/assets', express.static('assets')))
 
 // routes 

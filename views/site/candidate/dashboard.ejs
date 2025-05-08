@@ -1,0 +1,76 @@
+<div class="checkout-section pt-150 pt-lg-120 pb-130 pb-lg-70">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="order-confirm-sheet mb-50">
+                    <div class="cart-total-section d-flex gap-3 align-items-center">
+                        <div style="width: 150px;height: 150px;">
+                            <img src="/uploads/userInfo/<%= user.image %>" class="img-fluid object-fit-contain"
+                                alt="<%= user.name %>" style="border-radius: 50%;">
+                        </div>
+                        <div class="d-flex flex-column gap-1">
+                            <h3 class="m-0">
+                                <%= user.name %>
+                            </h3>
+                            <span>Member Since
+                                <% const memberSince=new Date(user.createdAt).toLocaleDateString() %>
+                                    <%= memberSince %>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="order-confirm-sheet mb-50">
+                    <div class="cart-total-section d-flex gap-3 align-items-center">
+                        <table class="cart-total-table">
+                            <tbody>
+                                <tr class='border-bottom-0'>
+                                    <th>
+                                        <a href="/profile/<%= user.name %>" class="text-dark">
+                                            <i class="fa-solid fa-user me-2"></i>
+                                            My Proflie
+                                        </a>
+                                    </th>
+                                </tr>
+                                <tr class='border-bottom-0'>
+                                    <th>
+                                        <a href="#" class="text-dark">
+                                            <i class="fa-solid fa-suitcase me-2"></i>
+                                            Applied Jobs
+                                        </a>
+                                    </th>
+                                </tr>
+                                <tr class='border-bottom-0'>
+                                    <th>
+                                        <a href="#" class="text-dark">
+                                            <i class="fa-solid fa-bookmark me-2"></i>
+                                            Saved Jobs
+                                        </a>
+                                    </th>
+                                </tr>
+                                <tr class='border-bottom-0'>
+                                    <th>
+                                        <a href="/profile/<%= user.name %>/projects" class="text-dark">
+                                            <i class="fa-solid fa-diagram-project me-2"></i>
+                                            Add Projects
+                                        </a>
+                                    </th>
+                                </tr>
+                                <tr class='border-bottom-0'>
+                                    <th>
+                                        <a href="/profile/settings" class="text-dark">
+                                            <i class="fa-solid fa-screwdriver-wrench me-2"></i>
+                                            Settings
+                                        </a>
+                                    </th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <%- include(profilelayout,{ locals: { user }, margin:false, padding:false,profile:false }) %>
+            </div>
+        </div>
+    </div>
+</div>

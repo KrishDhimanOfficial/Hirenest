@@ -39,6 +39,7 @@ router.route('/login')
         })(req, res, next)
     })
 
+router.put('/api/change_user_password', upload.none(), usersControllers.updateUserPassword)
 router.route('/api/user')
     .get(usersControllers.getuserInfo)
     .put(userInfo.fields(
@@ -49,6 +50,7 @@ router.route('/api/user')
     ),
         handlemulterError,
         usersControllers.updateuserInfo)
+    .patch(upload.none(), usersControllers.updateUserPassword)
     .delete(usersControllers.deleteuserInfo)
 
 

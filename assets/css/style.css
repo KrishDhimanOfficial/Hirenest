@@ -170,3 +170,36 @@ a {
   }
       
 /* form */
+
+/* From Uiverse.io by SpatexDEV */ 
+.uploadfile {
+  border: none;
+  padding: 0.75rem 1.5rem;
+  background-color: #488aec;
+  color: #ffffff !important;
+  font-size: 0.75rem !important;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  text-transform: uppercase;
+  vertical-align: middle;
+  align-items: center;
+  border-radius: 0.5rem;
+  user-select: none;
+  box-shadow:
+    0 4px 6px -1px #488aec31,
+    0 2px 4px -1px #488aec17;
+  transition: all 0.6s ease;
+}
+
+.uploadfile:hover {
+  box-shadow:
+    0 10px 15px -3px #488aec4f,
+    0 4px 6px -2px #488aec17;
+}
+
+.uploadfile:focus,
+.uploadfile:active {
+  opacity: 0.85;
+  box-shadow: none;
+}

@@ -1,5 +1,6 @@
 import { Country, State, City } from 'country-state-city'
 import skillModel from '../models/skill.model.js'
+import userModel from '../models/user.model.js'
 const siteControllers = {
     renderHomePage: async (req, res) => {
         try {
@@ -16,10 +17,12 @@ const siteControllers = {
     renderProfilePage: async (req, res) => {
         try {
             if (!req.user) return res.redirect('/login')
+            if (req.user?.image && req.user.resume) return res.redirect(`/profile/${req.user?.name}`)
             return res.render('layout/site',
                 {
                     body: '../site/candidate/userProfile',
-                    title: `Profile - ${req.user?.name}`,
+                    title: `Profile`,
+                    subtitle: `Profile - ${req.user?.name}`,
                     endApi: `api/user`,
                     user: req.user
                 })
@@ -81,6 +84,71 @@ const siteControllers = {
             return res.status(200).json(response)
         } catch (error) {
             console.log('getSkills : ' + error.message)
+        }
+    },
+    renderUserDashboard: async (req, res) => {
+        try {
+            const country = req.user?.location.country;
+            const state = req.user?.location.state;
+            const city = req.user?.location.city;
+
+            const skills = await userModel.aggregate([
+                {
+                    $lookup: {
+                        from: 'jobskills',
+                        localField: 'skills',
+                        foreignField: '_id',
+                        as: 'skills'
+                    }
+                },
+                { $unwind: "$skills" },
+                { $replaceRoot: { newRoot: '$skills' } }
+            ])
+            return res.render('layout/site',
+                {
+                    body: '../site/candidate/dashboard',
+                    profilelayout: './userProfile',
+                    title: `Profile`,
+                    subtitle: `Profile - ${req.user?.name}`,
+                    endApi: `api/user`,
+                    user: req.user,
+                    skills,
+                    country: Country.getCountryByCode(country),
+                    state: State.getStateByCodeAndCountry(state, country),
+                    city: City.getCitiesOfState(country, state).filter(c => c.name === city)[0]
+                })
+        } catch (error) {
+            console.log('renderUserDashboard : ' + error.message)
+        }
+    },
+    renderProfileSettings: async (req, res) => {
+        try {
+            return res.render('layout/site',
+                {
+                    body: '../site/candidate/dashboard',
+                    profilelayout: './settings',
+                    title: `Profile`,
+                    subtitle: `Profile - ${req.user?.name}`,
+                    endApi: 'api/user',
+                    user: req.user,
+                })
+        } catch (error) {
+            console.log('renderProfileSettings  : ' + error.message)
+        }
+    },
+    renderUserProjects: async (req, res) => {
+        try {
+            return res.render('layout/site',
+                {
+                    body: '../site/candidate/dashboard',
+                    profilelayout: './projects',
+                    title: `Profile`,
+                    subtitle: `Profile - ${req.user?.name}`,
+                    endApi: '',
+                    user: req.user,
+                })
+        } catch (error) {
+            console.log('renderUserProjects : ' + error.message)
         }
     },
 }

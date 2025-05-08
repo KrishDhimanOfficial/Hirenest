@@ -40,12 +40,12 @@ const userSchema = new mongoose.Schema({
 
     image: {
         type: String,
-        match: [/[0-9].(jpg|jpeg|png|gif)/, 'Invalid image URL format.']
+        match: [/[0-9].(jpg|jpeg|png|webp)/, 'Invalid image URL format.']
     },
 
     resume: {
         type: mongoose.Schema.Types.String,
-        match: [/[0-9].(pdf)/, 'Invalid resume format.']
+        match: [/[0-9].(zip)/, 'Invalid resume format.']
     },
 
     phone: {
@@ -78,12 +78,16 @@ const userSchema = new mongoose.Schema({
     },
 
     skills: {
-        type: [String],
+        type: [mongoose.Schema.Types.ObjectId],
         validate: {
             validator: (v) => v.length <= 10,
             message: 'You can only add up to 10 skills.'
         }
     },
+
+    appliedJobs: { type: [mongoose.Schema.Types.ObjectId] },
+    savedJobs: { type: [mongoose.Schema.Types.ObjectId] },
+    userprojectIds: { type: [mongoose.Schema.Types.ObjectId] },
 
     isrecuiter: {
         type: Boolean,

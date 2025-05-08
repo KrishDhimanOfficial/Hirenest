@@ -1,95 +1,144 @@
-<div class="checkout-section pt-150 pt-lg-120 pb-130 pb-lg-70">
+<div class="checkout-section <%= padding ? 'pt-150 pt-lg-120 pb-130 pb-lg-70' : 'px-4 py-0' %>">
     <div class="container">
         <form id="updateFormSite" class="checkout-form">
             <div class="row">
-                <div class="col-lg-8 mx-auto">
-                    <h3 class="cart-title">Create Profile</h3>
-                    <div class="user-profile-data">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <label>Your Profile Image</label>
-                                <input type="file" name="image" accept="image/*" class="single-input-wrapper">
-                            </div>
-                            <div class="col-lg-12">
-                                <label>Your Name</label>
-                                <input type="text" placeholder="Name" name="name" class="single-input-wrapper"
-                                    value="<%= user.name %>">
-                            </div>
-                            <div class="col-lg-12">
-                                <label>Gender</label>
-                                <div class="payment-option">
-                                    <ul class="payment-list style-none d-flex gap-3">
-                                        <li>
-                                            <input type="radio" name="gender" value="m" class="payment-radio-button">
-                                            <label>Male</label>
-                                        </li>
-                                        <li>
-                                            <input type="radio" name="gender" value="f" id="credit-card"
-                                                class="payment-radio-button">
-                                            <label>Female</label>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <label>Street Address</label>
-                                <input type="text" placeholder="Street Address*" name="address"
-                                    class="single-input-wrapper">
-                            </div>
-                            <div class="col-lg-12">
-                                <label>Linkedin URL</label>
-                                <input type="text" placeholder="Linkdin URL" name="url" class="single-input-wrapper">
-                            </div>
-                            <div class="col-12 mb-3">
-                                <label>Skills</label>
-                                <select id="jobskills" multiple class="single-input-wrapper select2" name="skills"
-                                    style="width: 100%;">
-                                </select>
-                            </div>
-                            <div class="col-lg-4 mb-3">
-                                <label>Country</label>
-                                <select id="countrySelect" class="single-input-wrapper select2" name="country"
-                                    style="width: 100%;">
-                                </select>
-                            </div>
-                            <div class="col-lg-4  mb-3">
-                                <label>State</label>
-                                <select id="stateSelect" class="single-input-wrapper select2" name="state"
-                                    style="width: 100%;">
-                                </select>
-                            </div>
-                            <div class="col-lg-4  mb-3">
-                                <label>Town/City</label>
-                                <select id="citySelect" class="single-input-wrapper select2" name="city"
-                                    style="width: 100%;">
-                                </select>
-                            </div>
-                            <div class="col-lg-6">
-                                <label>Email Id</label>
-                                <input type="email" placeholder="Email Address*" name="email"
-                                    class="single-input-wrapper" value="<%= user.email %>">
-                            </div>
-                            <div class="col-lg-6">
-                                <label>Phone Number</label>
-                                <input type="hidden" id="endapi" value="<%= endApi %>">
-                                <input type="text" placeholder="Phone Number*" name="phone" class="single-input-wrapper"
-                                    value="<%= user.phone %>">
-                            </div>
-                            <div class="col-lg-12">
-                                <label>Resume</label>
-                                <input type="file" name="resume" accept=".pdf" class="single-input-wrapper" required>
-                            </div>
-                            <div class="col-12 other-note-area">
-                                <label>Bio</label>
-                                <textarea placeholder="bio" name="bio" spellcheck="false"></textarea>
-                            </div>
-                            <div class="col signup-form">
-                                <div class="submit-btn">
-                                    <Button id="submitFormBtn" type="submit" class="signup-btn btn-1">Submit</Button>
-                                </div>
-                            </div>
-                        </div> <!-- /.row -->
-                    </div> <!-- /.user-profile-data -->
+                <div class="col-12 <%= margin ? 'mx-auto' : 'm-0' %> ">
+                    <% if ( profile) { %>
+                        <h3 class="cart-title">
+                            Create Profile
+                        </h3>
+                        <% } %>
+                            <div class="user-profile-data">
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label class="uploadfile" for="pimage">
+                                            <i class="fa-solid fa-file-image me-2"></i>
+                                            Upload Image
+                                        </label>
+                                        <!-- From Uiverse.io by SpatexDEV -->
+                                        <input type="file" id="pimage" hidden name="image" accept="image/*"
+                                            class="single-input-wrapper">
+                                    </div>
+                                    <div class="col-lg-3 ms-auto">
+                                        <div style="width: 150px;height: 150px; display: none;" >
+                                            <img src="" id="previewImg">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <label>Your Name</label>
+                                        <input type="text" placeholder="Name" name="name" class="single-input-wrapper"
+                                            value="<%= user.name %>">
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <label>Gender</label>
+                                        <div class="payment-option">
+                                            <ul class="payment-list style-none d-flex gap-3">
+                                                <% if (user.gender==='m' ) { %>
+                                                    <li>
+                                                        <input type="radio" name="gender" value="m"
+                                                            class="payment-radio-button" checked>
+                                                        <label>Male</label>
+                                                    </li>
+                                                    <li>
+                                                        <input type="radio" name="gender" value="f" id="credit-card"
+                                                            class="payment-radio-button">
+                                                        <label>Female</label>
+                                                    </li>
+                                                    <% } else { %>
+                                                        <li>
+                                                            <input type="radio" name="gender" value="m"
+                                                                class="payment-radio-button" checked>
+                                                            <label>Male</label>
+                                                        </li>
+                                                        <li>
+                                                            <input type="radio" name="gender" value="f" id="credit-card"
+                                                                class="payment-radio-button" checked>
+                                                            <label>Female</label>
+                                                        </li>
+                                                        <% } %>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label>Street Address</label>
+                                        <input type="text" placeholder="Street Address*" name="address"
+                                            class="single-input-wrapper" value="<%= user.location?.address %>">
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <label>Linkedin URL</label>
+                                        <input type="url" placeholder="Linkdin URL" name="url"
+                                            class="single-input-wrapper" value="<%= user.url %>">
+                                    </div>
+                                    <div class="col-12 mb-3">
+                                        <label>Skills</label>
+                                        <select id="jobskills" multiple class="single-input-wrapper select2"
+                                            name="skills" style="width: 100%;">
+                                            <% skills.forEach(skill=> { %>
+                                                <option value="<%= skill._id %>" selected>
+                                                    <%= skill.name %>
+                                                </option>
+                                                <% }) %>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-4 mb-3">
+                                        <label>Country</label>
+                                        <select id="countrySelect" class="single-input-wrapper select2" name="country"
+                                            style="width: 100%;">
+                                            <option value="<%= country.isoCode %>" selected>
+                                                <%= country.name %>
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-4  mb-3">
+                                        <label>State</label>
+                                        <select id="stateSelect" class="single-input-wrapper select2" name="state"
+                                            style="width: 100%;">
+                                            <option value="<%= state.isoCode %>" selected>
+                                                <%= state.name %>
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-4  mb-3">
+                                        <label>Town/City</label>
+                                        <select id="citySelect" class="single-input-wrapper select2" name="city"
+                                            style="width: 100%;">
+                                            <option value="<%= city.name %>" selected>
+                                                <%= city.name %>
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <label>Email Id</label>
+                                        <input type="email" placeholder="Email Address*" name="email"
+                                            class="single-input-wrapper" value="<%= user.email %>">
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <label>Phone Number</label>
+                                        <input type="hidden" id="endapi" value="<%= endApi %>">
+                                        <input type="text" placeholder="Phone Number*" name="phone"
+                                            class="single-input-wrapper" value="<%= user.phone %>">
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <label class="uploadfile" for="resumefile">
+                                            <i class="fa-solid fa-file me-2"></i>
+                                            Upload Resume
+                                        </label>
+                                        <input type="file" hidden id="resumefile" name="resume" accept=".pdf"
+                                            class="single-input-wrapper">
+                                    </div>
+                                    <div class="col-12 other-note-area">
+                                        <label>Bio</label>
+                                        <textarea placeholder="bio" name="bio"
+                                            spellcheck="false"><%= user.bio %></textarea>
+                                    </div>
+                                    <div class="col signup-form">
+                                        <div class="submit-btn">
+                                            <Button id="submitFormBtn" type="submit"
+                                                class="signup-btn btn-1">Submit</Button>
+                                        </div>
+                                    </div>
+                                </div> <!-- /.row -->
+                            </div> <!-- /.user-profile-data -->
                 </div>
             </div>
         </form>

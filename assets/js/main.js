@@ -1,10 +1,11 @@
 import {
-    Form, Notify, siteForm, updatetableData, submitFormBtn, datatable, deletebtn,
-    handleDeleteRequest, updatetableDataStatus
+    Form, Notify, siteForm, confirmDeleteBtn, updatetableData, submitFormBtn, datatable, deletebtn,
+    handleDeleteRequest, updatetableDataStatus, previewImage
 } from './variable.js'
 import Fetch from './fetch.js'
 
 const apiInput = document.querySelector('#endapi')
+const ImageInput = document.querySelector('#pimage')
 
 if (document.querySelector("#datatable")) $("#datatable").DataTable({
     "paging": true,
@@ -57,14 +58,34 @@ const openDangerModal = (table_row, api) => {
     return;
 }
 
+if (confirmDeleteBtn) confirmDeleteBtn.onclick = async () => {
+    try {
+        confirmDeleteBtn.disabled = true;
+        confirmDeleteBtn.innerHTML = 'Deleting...';
+
+        const res = Fetch.delete(`/${apiInput.value.trim()}`)
+
+        Notify(res)
+        if (res.success) { setTimeout(() => { window.location.reload() }, 600) }
+    } catch (error) {
+        console.error(error)
+    } finally {
+        confirmDeleteBtn.disabled = false;
+        confirmDeleteBtn.innerHTML = 'Delete';
+    }
+}
+
 if (siteForm) siteForm.onsubmit = async (e) => {
     try {
         e.preventDefault()
         submitFormBtn.disabled = true;
         submitFormBtn.innerHTML = 'Submitting...';
+        let res;
 
         const formdata = new FormData(e.target)
-        const res = await Fetch.put(`/${apiInput.value.trim()}`, formdata)
+        siteForm.id === 'updateFormSite'
+            ? res = await Fetch.put(`/${apiInput.value.trim()}`, formdata)
+            : res = await Fetch.patch(`/${apiInput.value.trim()}`, formdata, { patch: true })
 
         Notify(res) // Notify Server Message
         if (res.success) setTimeout(() => { window.location.reload() }, 600)
@@ -75,6 +96,8 @@ if (siteForm) siteForm.onsubmit = async (e) => {
         submitFormBtn.innerHTML = 'Submit';
     }
 }
+
+if (ImageInput) ImageInput.onchange = (e) => { previewImage(e) }
 
 $('.select2').select2()
 let controller = null;
