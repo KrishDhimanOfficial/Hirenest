@@ -1,6 +1,7 @@
 import {
-    Form, Notify, siteForm, confirmDeleteBtn, updatetableData, submitFormBtn, datatable, deletebtn,
-    handleDeleteRequest, updatetableDataStatus, previewImage
+    Form, Notify, siteForm, TextINput, confirmDeleteBtn, updatetableData, submitFormBtn, datatable, deletebtn,
+    handleDeleteRequest, updatetableDataStatus, previewImage, updateuserProject, updateusereducation,
+    updateuserexperience
 } from './variable.js'
 import Fetch from './fetch.js'
 
@@ -21,6 +22,25 @@ window.onload = () => {
     if (window.location.pathname === '/dashboard') Notify({ success: 'Welcome to HireNest' })
 }
 
+document.onclick = (e) => {
+    if (e.target.closest('.btn.btn-primary.float-end') &&
+        e.target.type === 'button' &&
+        e.target.dataset.bsTarget == '#modal' &&
+        e.target.dataset.bsToggle == 'modal'
+    ) {
+        return TextINput.value = null
+    }
+}
+
+if (document.querySelector('#addproject')) document.getElementById('addproject').addEventListener('click', () => {
+    const form = document.getElementById('submitForm');
+    const inputs = form.querySelectorAll('input, textarea');
+
+    inputs.forEach(input => {
+        input.value = null;
+    })
+})
+
 
 if (datatable) datatable.onclick = (e) => {
     const endApi = `/${apiInput.value.trim()}/${e.target.dataset.id}`;
@@ -29,6 +49,9 @@ if (datatable) datatable.onclick = (e) => {
     if (e.target.closest('.danger-modal')) openDangerModal(table_row, endApi)
     if (e.target.closest('.status')) updatetableDataStatus(e.target.checked, endApi)
     if (e.target.closest('.edit')) updatetableData(endApi)
+    if (e.target.closest('.projectedit')) updateuserProject(endApi)
+    if (e.target.closest('.educationedit')) updateusereducation(endApi)
+    if (e.target.closest('.experienceedit')) updateuserexperience(endApi)
 }
 
 if (Form) Form.onsubmit = async (e) => {
@@ -99,7 +122,10 @@ if (siteForm) siteForm.onsubmit = async (e) => {
 
 if (ImageInput) ImageInput.onchange = (e) => { previewImage(e) }
 
-$('.select2').select2()
+$('.select2').select2({
+    dropdownParent: $('#openprojectmodal')
+})
+
 let controller = null;
 $('#countrySelect').on('select2:open', function () {
 
@@ -181,6 +207,7 @@ $('#jobskills').on('select2:open', function () {
 
             controller = new AbortController()
             const skills = await Fetch.get(`/api/job-skills?skill=${searchTerm}`, {}, controller.signal)
+            console.log(skills);
 
             // Add new options
             skills.forEach(skill => {

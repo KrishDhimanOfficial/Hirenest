@@ -1,13 +1,19 @@
 import { Country, State, City } from 'country-state-city'
 import skillModel from '../models/skill.model.js'
 import userModel from '../models/user.model.js'
+import userProjectModel from '../models/user.project.model.js'
+import handleAggregatePagination from '../services/handlepagePagination.js'
+import educationModel from '../models/education.model.js'
+import experienceModel from '../models/experience.model.js'
+
 const siteControllers = {
     renderHomePage: async (req, res) => {
         try {
             return res.render('layout/site',
                 {
                     body: '../site/home',
-                    title: 'Home'
+                    title: 'Home',
+                    user: req.user
                 }
             )
         } catch (error) {
@@ -108,7 +114,7 @@ const siteControllers = {
                 {
                     body: '../site/candidate/dashboard',
                     profilelayout: './userProfile',
-                    title: `Profile`,
+                    title: 'HireNest | Profile',
                     subtitle: `Profile - ${req.user?.name}`,
                     endApi: `api/user`,
                     user: req.user,
@@ -127,7 +133,7 @@ const siteControllers = {
                 {
                     body: '../site/candidate/dashboard',
                     profilelayout: './settings',
-                    title: `Profile`,
+                    title: 'HireNest | Profile',
                     subtitle: `Profile - ${req.user?.name}`,
                     endApi: 'api/user',
                     user: req.user,
@@ -138,17 +144,121 @@ const siteControllers = {
     },
     renderUserProjects: async (req, res) => {
         try {
+            const pipeline = [
+                {
+                    $match: { candidateId: req.user?._id }
+                },
+                { $sort: { _id: -1 } },
+                { $project: { name: 1, url: 1, project_duration: 1 } }
+            ]
+            const projects = await handleAggregatePagination(userProjectModel, pipeline, req.query)
+
             return res.render('layout/site',
                 {
                     body: '../site/candidate/dashboard',
                     profilelayout: './projects',
-                    title: `Profile`,
+                    title: 'HireNest | Profile',
                     subtitle: `Profile - ${req.user?.name}`,
-                    endApi: '',
+                    endApi: 'api/user/project',
                     user: req.user,
+                    projects
                 })
         } catch (error) {
             console.log('renderUserProjects : ' + error.message)
+        }
+    },
+    renderUserEducation: async (req, res) => {
+        try {
+            const pipeline = [
+                { $match: { candidateId: req.user?._id } },
+                {
+                    $addFields: {
+                        completedYear: {
+                            $dateToString: { format: "%Y", date: "$endDate" }
+                        }
+                    }
+                }
+            ]
+            return res.render('layout/site',
+                {
+                    body: '../site/candidate/dashboard',
+                    profilelayout: './educations',
+                    title: 'HireNest | Profile',
+                    subtitle: `Profile - ${req.user?.name}`,
+                    endApi: 'api/user/education',
+                    user: req.user,
+                    educations: await handleAggregatePagination(educationModel, pipeline, req.query)
+                })
+        } catch (error) {
+            console.log('renderUserEducation : ' + error.message)
+        }
+    },
+    renderUserExperience: async (req, res) => {
+        try {
+            const months = ["January", "February", "March", "April", "May"
+                , "June", "July", "August", "September", "October", "November"
+                , "December"]
+            const pipeline = [
+                { $match: { candidateId: req.user?._id } },
+                { $sort: { startDate: -1 } },
+                {
+                    $addFields: {
+                        startDay: { $dayOfMonth: "$startDate" },
+                        startMonth: { $month: "$startDate" },
+                        startYear: { $year: "$startDate" },
+                        endDay: { $dayOfMonth: "$endDate" },
+                        endMonth: { $month: "$endDate" },
+                        endYear: { $year: "$endDate" }
+                    }
+                },
+                {
+                    $addFields: {
+                        startDate: {
+                            $concat: [
+                                { $toString: "$startDay" }, " ",
+                                {
+                                    $arrayElemAt: [months, "$startMonth"]
+                                },
+                                ", ",
+                                { $toString: "$startYear" }
+                            ]
+                        },
+                        endDate: {
+                            $concat: [
+                                { $toString: "$endDay" },
+                                " ",
+                                {
+                                    $arrayElemAt: [months, "$endMonth"]
+                                },
+                                ", ",
+                                { $toString: "$endYear" }
+                            ]
+                        }
+                    }
+                },
+                {
+                    $project: {
+                        companyName: 1,
+                        position: 1,
+                        startDate: 1,
+                        endDate: 1,
+                        stillworking: 1
+                    }
+                }
+            ]
+
+            return res.render('layout/site',
+                {
+                    body: '../site/candidate/dashboard',
+                    profilelayout: './experiences',
+                    title: 'HireNest | Profile',
+                    subtitle: `Profile - ${req.user?.name}`,
+                    endApi: 'api/user/experience',
+                    user: req.user,
+                    experiences: await handleAggregatePagination(experienceModel, pipeline, req.query)
+                })
+        } catch (error) {
+            console.log('renderUserExperience : ' + error.message)
         }
     },
 }

@@ -13,7 +13,7 @@
                     </div>
                     <div class="category-menu-wrap">
                         <div class="header-dropdown ms-0">
-                            <h1 class="text-whitet4">HireNest</h1>
+                            <h1 class="text-white">HireNest</h1>
                         </div>
                     </div>
                 </div>
@@ -22,11 +22,6 @@
                         <ul>
                             <li class="has-dropdown">
                                 <a href="/">Home</a>
-                                <ul class="sub-menu">
-                                    <li><a href="index.html">Home 1</a></li>
-                                    <li><a href="index-2.html">Home 2</a></li>
-                                    <li><a href="index-3.html">Home 3</a></li>
-                                </ul>
                             </li>
                             <li><a href="about-us.html">About</a></li>
                             <li class="has-dropdown">
@@ -65,7 +60,13 @@
                                     <li><a href="blog-details.html">Blog Details</a></li>
                                 </ul>
                             </li>
-                            <li><a href="">Post Job</a></li>
+                            <% if (user) { %>
+                                <li>
+                                    <a href="<%= user.isrecuiter ? '/recruiter' : '/profile' %>">
+                                        <%= user.isrecuiter ? ' Post Job' :'Profile' %>
+                                    </a>
+                                </li>
+                            <% } %>
                         </ul>
                     </div>
                     <div class="open-menu-bar">

@@ -62,6 +62,27 @@ router.get('/api/cities', siteControllers.getcities)
 // Job skills
 router.get('/api/job-skills', siteControllers.getSkills)
 
+// Project
+router.route('/api/user/project/:id?')
+    .post(upload.none(), usersControllers.createUserProject)
+    .get(usersControllers.get_userProject)
+    .put(upload.none(), usersControllers.update_userProject)
+    .delete(usersControllers.delete_userProject)
+
+// Experience
+router.route('/api/user/experience/:id?')
+    .post(upload.none(), usersControllers.createuserExperience)
+    .get(usersControllers.getuserExperience)
+    .put(upload.none(), usersControllers.updateuserExperience)
+    .delete(usersControllers.deleteuserExperience)
+
+// Education
+router.route('/api/user/education/:id?')
+    .post(upload.none(), usersControllers.createEducation)
+    .get(usersControllers.getSingleEducation)
+    .put(upload.none(), usersControllers.updateEducation)
+    .delete(usersControllers.deleteEducation)
+
 router.use('/profile', checkIsCandidate, userProfileRoutes)
 router.use('/recruiter', checkIsRecruiter, recuriterProfileRoutes)
 

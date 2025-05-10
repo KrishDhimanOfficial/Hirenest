@@ -10,10 +10,10 @@
                     </div>
                     <form method="post" action="/login" autocomplete="off">
                         <div class="input-wrap mb-20">
-                            <input type="text" placeholder="Email" name="email">
+                            <input type="email" placeholder="Email" name="email" required>
                         </div>
                         <div class="input-wrap pass mb-20">
-                            <input type="text" placeholder="Password" name="password">
+                            <input type="password" placeholder="Password" name="password" required>
                         </div>
                         <div class="col-12">
                             <% if (locals.error) { %>

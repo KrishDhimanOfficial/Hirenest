@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 const userProjectsSchema = new mongoose.Schema({
+    candidateId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+    },
     name: {
         type: mongoose.Schema.Types.String,
         required: [true, 'Input Field is required.'],
@@ -10,17 +15,18 @@ const userProjectsSchema = new mongoose.Schema({
     project_duration: {
         type: {
             start: {
-                month: { type: mongoose.Schema.Types.String },
+                month: { type: mongoose.Schema.Types.Number },
                 year: { type: mongoose.Schema.Types.Number }
             },
             end: {
-                month: { type: mongoose.Schema.Types.String },
+                month: { type: mongoose.Schema.Types.Number },
                 year: { type: mongoose.Schema.Types.Number }
             }
-        }
+        },
+        _id: false
     },
     skills: {
-        type: [mongoose.Schema.Types.String],
+        type: [mongoose.Schema.Types.ObjectId],
         required: [true, 'Input Field is required.'],
         trim: [true, 'Input Field contains spaces.'],
         match: [/[A-Za-z\s]{1,10}/, 'Name contains only 10 charcters.'],
@@ -40,4 +46,5 @@ const userProjectsSchema = new mongoose.Schema({
     }
 })
 
+userProjectsSchema.plugin(mongooseAggregatePaginate)
 export default mongoose.model('userProjects', userProjectsSchema)

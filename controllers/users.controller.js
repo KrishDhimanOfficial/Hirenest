@@ -1,10 +1,13 @@
 import userModel from "../models/user.model.js"
 import bcrypt from 'bcrypt'
+import { parseISO, format } from 'date-fns'
 import validate from "../services/validate.js"
 import userProjectModel from "../models/user.project.model.js"
 import mongoose from "mongoose";
 import deleteFile from '../services/deleteFile.js'
 import ZipFile from "../services/ZipFile.js";
+import experienceModel from "../models/experience.model.js";
+import educationModel from "../models/education.model.js"
 const ObjectId = mongoose.Types.ObjectId;
 const validateId = mongoose.Types.ObjectId.isValid;
 
@@ -128,11 +131,24 @@ const usersControllers = {
     },
     createUserProject: async (req, res) => {
         try {
-            const { name, desc, start, end, url } = req.body;
+
+            const { name, desc, startmonth, startyear, endmonth, endyear, url, skills } = req.body;
+            if (typeof skills === 'string') return res.status(400).json({ info: 'Select 2-3 Project Skills' })
+
             const response = await userProjectModel.create({
-                name, desc,
-                project_duration: { start, end },
-                url
+                candidateId: req.user?._id,
+                name, desc, url,
+                skills: skills?.map(id => new ObjectId(id)),
+                project_duration: {
+                    start: {
+                        month: startmonth,
+                        year: startyear
+                    },
+                    end: {
+                        month: endmonth,
+                        year: endyear
+                    }
+                },
             })
 
             if (!response) return res.status(400).json({ error: 'Something went wrong, please try again later.' })
@@ -146,9 +162,24 @@ const usersControllers = {
         try {
             if (!validateId(req.params.id)) return res.status(400).json({ error: 'Invalid Request.' })
 
-            const response = await userProjectModel.findById({ _id: req.params.id })
+            const response = await userProjectModel.aggregate([
+                {
+                    $match: {
+                        _id: new mongoose.Types.ObjectId(req.params.id),
+                        candidateId: req.user?._id
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'jobskills',
+                        localField: 'skills',
+                        foreignField: '_id',
+                        as: 'skills'
+                    }
+                },
+            ])
             if (!response) return res.status(404).json({ error: 'Not Found.' })
-            return res.status(200).json(response)
+            return res.status(200).json(response[0])
         } catch (error) {
             console.log('get_userProject : ' + error.message)
         }
@@ -157,10 +188,26 @@ const usersControllers = {
         try {
             if (!validateId(req.params.id)) return res.status(400).json({ error: 'Invalid Request.' })
 
-            const { name, desc, start, end, url } = req.body;
+            const { name, desc, startmonth, startyear, endmonth, endyear, url, skills } = req.body;
+            if (typeof skills === 'string') return res.status(400).json({ info: 'Select 2-3 Project Skills' })
+
             const response = await userProjectModel.findByIdAndUpdate(
                 { _id: req.params.id },
-                { name, desc, project_duration: { start, end }, url },
+                {
+                    candidateId: req.user?._id,
+                    name, desc, url,
+                    skills: skills?.map(id => new ObjectId(id)),
+                    project_duration: {
+                        start: {
+                            month: startmonth,
+                            year: startyear
+                        },
+                        end: {
+                            month: endmonth,
+                            year: endyear
+                        }
+                    },
+                },
                 { new: true, runValidators: true }
             )
             if (!response) return res.status(404).json({ error: 'Something went wrong, please try again later.' })
@@ -173,14 +220,153 @@ const usersControllers = {
     delete_userProject: async (req, res) => {
         try {
             if (!validateId(req.params.id)) return res.status(400).json({ error: 'Invalid Request.' })
-
             const response = await userProjectModel.findByIdAndDelete({ _id: req.params.id })
             if (!response) return res.status(404).json({ error: 'Not Found.' })
-            return res.status(200).json({ success: 'Deleted successfully.' })
+            return res.status(200).json({ redirect: `/profile/${req.user?.name}/projects` })
         } catch (error) {
             console.log('delete_userProject : ' + error.message)
         }
-    }
+    },
+    createuserExperience: async (req, res) => {
+        try {
+            const { companyName, position, startDate, endDate, stillworking, description } = req.body;
+
+            const checkExstence = await experienceModel.findOne({ companyName, position })
+            if (checkExstence) return res.status(400).json({ error: `Enter Record Exists.` })
+
+            const docToBecreate = {
+                candidateId: req.user?._id,
+                companyName, position, description,
+                startDate: parseISO(startDate),
+            }
+
+            stillworking == ''
+                ? stillworking
+                : docToBecreate.endDate = parseISO(endDate)
+
+            const response = await experienceModel.create(docToBecreate)
+
+            if (!response) return res.status(400).json({ error: 'Something went wrong, please try again later.' })
+            return res.status(200).json({ redirect: `/profile/${req.user?.name}/experience` })
+        } catch (error) {
+            if (error.name === 'ValidationError') validate(res, error.errors)
+            console.log('createuserExperience : ' + error.message)
+        }
+    },
+    getuserExperience: async (req, res) => {
+        try {
+            if (!validateId(req.params.id)) return res.status(400).json({ error: 'Invalid Request.' })
+
+            const response = await experienceModel.findById({ _id: req.params.id })
+            if (!response) return res.status(400).json({ error: 'Not Found' })
+            return res.status(200).json(response)
+        } catch (error) {
+            if (error.name === 'ValidationError') validate(res, error.errors)
+            console.log('getuserExperience : ' + error.message)
+        }
+    },
+    updateuserExperience: async (req, res) => {
+        try {
+            if (!validateId(req.params.id)) return res.status(400).json({ error: 'Invalid Request.' })
+
+            let { companyName, position, startDate, endDate, stillworking, description } = req.body;
+            const docToBeupdate = {
+                stillworking,
+                companyName, position, description,
+                startDate: parseISO(startDate),
+            }
+
+            stillworking
+                ? docToBeupdate.stillworking = true
+                : docToBecreate.endDate = parseISO(endDate)
+
+            const response = await experienceModel.findByIdAndUpdate(
+                { _id: req.params.id },
+                docToBeupdate,
+                { new: true, runValidators: true })
+
+            if (!response) return res.status(400).json({ error: 'Something went wrong, please try again later.' })
+            return res.status(200).json({ redirect: `/profile/${req.user?.name}/experience` })
+        } catch (error) {
+            if (error.name === 'ValidationError') validate(res, error.errors)
+            console.log('updateuserExperience : ' + error.message)
+        }
+    },
+    deleteuserExperience: async (req, res) => {
+        try {
+            if (!validateId(req.params.id)) return res.status(400).json({ error: 'Invalid Request.' })
+
+            const response = await experienceModel.findByIdAndDelete({ _id: req.params.id })
+            if (!response) return res.status(400).json({ error: 'Something went wrong, please try again later.' })
+            return res.status(200).json({ redirect: `/profile/${req.user?.name}/experience` })
+        } catch (error) {
+            console.log('deleteuserExperience : ' + error.message)
+        }
+    },
+    createEducation: async (req, res) => {
+        try {
+
+            const { courseName, specializedField, schoolORUniversity, startDate, endDate, description } = req.body;
+
+            const checkExstence = await educationModel.findOne({ courseName })
+            if (checkExstence) return res.status(400).json({ warning: `Record with ${courseName} Exists.` })
+
+            const response = await educationModel.create({
+                candidateId: req.user?._id,
+                courseName,
+                specializedField, schoolORUniversity, description,
+                startDate: parseISO(startDate),
+                endDate: parseISO(endDate)
+            })
+
+            if (!response) return res.status(400).json({ error: 'Something went wrong, please try again later.' })
+            return res.status(200).json({ redirect: `/profile/${req.user?.name}/education` })
+        } catch (error) {
+            if (error.name === 'ValidationError') validate(res, error.errors)
+            console.log('createEducation : ' + error.message)
+        }
+    },
+    getSingleEducation: async (req, res) => {
+        try {
+            if (!validateId(req.params.id)) return res.status(400).json({ error: 'Invalid Request.' })
+
+            const response = await educationModel.findById({ _id: req.params.id })
+            if (!response) return res.status(400).json({ error: 'Something went wrong, please try again later.' })
+            return res.status(200).json(response)
+        } catch (error) {
+            console.log('getSingleEducation : ' + error.message)
+        }
+    },
+    updateEducation: async (req, res) => {
+        try {
+            if (!validateId(req.params.id)) return res.status(400).json({ error: 'Invalid Request.' })
+            const response = await educationModel.findByIdAndUpdate({ _id: req.params.id },
+                {
+                    courseName,
+                    specializedField, schoolORUniversity, description,
+                    startDate: parseISO(startDate),
+                    endDate: parseISO(endDate)
+                },
+                { new: true, runValidators: true })
+            if (!response) return res.status(400).json({ error: 'Something went wrong, please try again later.' })
+            return res.status(200).json({ redirect: `/profile/${req.user?.name}/education` })
+        } catch (error) {
+            if (error.name === 'ValidationError') validate(res, error.errors)
+            console.log('updateEducation : ' + error.message)
+        }
+    },
+    deleteEducation: async (req, res) => {
+        try {
+            if (!validateId(req.params.id)) return res.status(400).json({ error: 'Invalid Request.' })
+
+            const response = await educationModel.findByIdAndDelete({ _id: req.params.id })
+            if (!response) return res.status(400).json({ error: 'Something went wrong, please try again later.' })
+            return res.status(200).json({ success: 'Deleted successfully.' })
+        } catch (error) {
+            if (error.name === 'ValidationError') validate(res, error.errors)
+            console.log('deleteEducation : ' + error.message)
+        }
+    },
 }
 
 export default usersControllers

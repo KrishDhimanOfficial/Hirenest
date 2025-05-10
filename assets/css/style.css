@@ -1,7 +1,10 @@
 a {
     text-decoration: none;
 }
-
+/* body{
+  border: 2px solid #000;
+  background: #000;
+} */
 .switch {
     font-size: 17px;
     position: relative;
