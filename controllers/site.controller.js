@@ -36,17 +36,6 @@ const siteControllers = {
             console.log('renderProfilePage : ' + error.message)
         }
     },
-    renderRecuriterProfilePage: async (req, res) => {
-        try {
-            return res.render('layout/site',
-                {
-                    body: '../site/recuriter/userProfile',
-                    title: `Profile - ${req.user?.name}`
-                })
-        } catch (error) {
-            console.log('renderRecuriterProfilePage : ' + error.message)
-        }
-    },
     getCounteries: async (req, res) => {
         try {
             const { q } = req.query;
@@ -259,6 +248,40 @@ const siteControllers = {
                 })
         } catch (error) {
             console.log('renderUserExperience : ' + error.message)
+        }
+    },
+    renderRecuriterProfilePage: async (req, res) => {
+        try {
+            const country = req.user?.location.country;
+            const state = req.user?.location.state;
+            const city = req.user?.location.city;
+            return res.render('layout/site',
+                {
+                    body: '../site/recuriter/dashboard',
+                    profilelayout: './userProfile',
+                    title: `Profile - ${req.user?.companyName}`,
+                    user: req.user,
+                    endApi: 'api/recruiter',
+                    country: Country.getCountryByCode(country),
+                    state: State.getStateByCodeAndCountry(state, country),
+                    city: City.getCitiesOfState(country, state).filter(c => c.name === city)[0]
+                })
+        } catch (error) {
+            console.log('renderRecuriterProfilePage : ' + error.message)
+        }
+    },
+    renderRecuriterSettings: async (req, res) => {
+        try {
+            return res.render('layout/site',
+                {
+                    body: '../site/recuriter/dashboard',
+                    profilelayout: './settings',
+                    title: `Profile - ${req.user?.companyName}`,
+                    user: req.user,
+                    endApi: 'api/recruiter',
+                })
+        } catch (error) {
+            console.log('renderRecuriterSettings : ' + error.message)
         }
     },
 }

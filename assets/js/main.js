@@ -28,6 +28,24 @@ document.onclick = (e) => {
         e.target.dataset.bsTarget == '#modal' &&
         e.target.dataset.bsToggle == 'modal'
     ) {
+        Form.id = 'submitForm';
+        const form = document.getElementById('submitForm')
+        const inputs = form.querySelectorAll('input')
+
+        inputs.forEach(input => input.value = null)
+        return TextINput.value = null
+    }
+}
+document.onclick = (e) => {
+    if (e.target.closest('.signup-btn.btn-1') &&
+        e.target.type === 'submit' &&
+        e.target.dataset.bsToggle == 'modal'
+    ) {
+        Form.id = 'submitForm';
+        const form = document.getElementById('submitForm')
+        const inputs = form.querySelectorAll('input')
+
+        inputs.forEach(input => input.value = null)
         return TextINput.value = null
     }
 }
@@ -111,6 +129,7 @@ if (siteForm) siteForm.onsubmit = async (e) => {
             : res = await Fetch.patch(`/${apiInput.value.trim()}`, formdata, { patch: true })
 
         Notify(res) // Notify Server Message
+        siteForm.id = 'updateFormSite';
         if (res.success) setTimeout(() => { window.location.reload() }, 600)
     } catch (error) {
         console.error(error)
@@ -122,8 +141,13 @@ if (siteForm) siteForm.onsubmit = async (e) => {
 
 if (ImageInput) ImageInput.onchange = (e) => { previewImage(e) }
 
-$('.select2').select2({
-    dropdownParent: $('#openprojectmodal')
+$('.select2').each(function () {
+    const $select = $(this);
+    const $modal = $select.closest('.modal');
+
+    $select.select2({
+        dropdownParent: $modal.length ? $modal : $(document.body)
+    })
 })
 
 let controller = null;

@@ -2,7 +2,7 @@ import express from 'express'
 import passport from 'passport'
 import siteControllers from '../controllers/site.controller.js'
 import usersControllers from '../controllers/users.controller.js'
-import { upload, userInfo } from '../middleware/multer.middleware.js'
+import { companylogo, upload, userInfo } from '../middleware/multer.middleware.js'
 import { checkIsCandidate, checkIsRecruiter } from '../middleware/authentication.js'
 import handlemulterError from '../middleware/handleMulterErrors.js'
 import userProfileRoutes from './site.user.profile.routes.js'
@@ -34,12 +34,11 @@ router.route('/login')
                         error: 'Your Account is Deactive.'
                     }
                 )
-                user.isrecuiter ? res.redirect('/recruiter') : res.redirect('/profile')
+                user.isrecuiter ? res.redirect('/recruiter/profile') : res.redirect('/profile')
             })
         })(req, res, next)
     })
 
-router.put('/api/change_user_password', upload.none(), usersControllers.updateUserPassword)
 router.route('/api/user')
     .get(usersControllers.getuserInfo)
     .put(userInfo.fields(
@@ -82,6 +81,11 @@ router.route('/api/user/education/:id?')
     .get(usersControllers.getSingleEducation)
     .put(upload.none(), usersControllers.updateEducation)
     .delete(usersControllers.deleteEducation)
+
+router.route('/api/recruiter')
+    .put(companylogo.single('image'), handlemulterError, usersControllers.updateRecruiterInfo)
+    .patch(upload.none(), usersControllers.changeRecuriterPassword)
+    .delete(usersControllers.deleteRecuirterInfo)
 
 router.use('/profile', checkIsCandidate, userProfileRoutes)
 router.use('/recruiter', checkIsRecruiter, recuriterProfileRoutes)

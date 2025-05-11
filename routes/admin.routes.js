@@ -7,6 +7,15 @@ import { upload } from '../middleware/multer.middleware.js'
 import usersControllers from '../controllers/users.controller.js'
 const router = express.Router()
 
+router.get('/logout', (req, res, next) => {
+    req.logout((err) => {
+        if (err) return next(err)
+        req.session.destroy(() => {
+            res.clearCookie('connect.sid'); // Adjust cookie name if needed
+            return res.redirect('/dashboard/login')
+        })
+    })
+})
 router.route('/login')
     .get((req, res) => res.render('admin/login', { layout: false, title: 'Login' }))
     .post((req, res, next) => {

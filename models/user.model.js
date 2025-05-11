@@ -8,6 +8,8 @@ const userSchema = new mongoose.Schema({
         trim: true,
     },
 
+    companyName: { type: String },
+
     email: {
         type: String,
         required: [true, 'Email is required!'],
@@ -57,8 +59,8 @@ const userSchema = new mongoose.Schema({
     url: {
         type: String,
         match: [
-            /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[a-zA-Z0-9-_%]+\/?$/,
-            'Invalid LinkedIn profile URL.'
+            /^(https:\/\/)?(www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(\/[\w\-._~\/]*)?(#[\w\-]*)?$/,
+            'Invalid URL.'
         ],
         trim: true
     },

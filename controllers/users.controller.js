@@ -367,6 +367,62 @@ const usersControllers = {
             console.log('deleteEducation : ' + error.message)
         }
     },
+    updateRecruiterInfo: async (req, res) => {
+        try {
+            const { companyName, name, phone, address, country, state, city, bio, url } = req.body;
+
+            if (!companyName || !name || !phone || !address || !country || !state || !city || !bio || !url) {
+                await deleteFile(`logo/${req.file.filename}`)
+                return res.status(400).json({ info: "All Fields Required." })
+            }
+
+            const docToBeupdate = {
+                name, phone, companyName,
+                location: { address, country, state, city },
+                bio, url
+            }
+            if (req.file.filename) docToBeupdate.image = req.file.filename
+
+            const response = await userModel.findByIdAndUpdate(
+                { _id: req.user?._id },
+                docToBeupdate,
+                { runValidators: true }
+            )
+            if (!response) return res.json({ error: 'message!' })
+            return res.json({ redirect: '/recruiter/profile' })
+        } catch (error) {
+            await deleteFile(`logo/${req.file.filename}`)
+            if (error.name === 'ValidationError') validate(res, error.errors)
+            console.log('updateRecruiterInfo : ' + error.message)
+        }
+    },
+    changeRecuriterPassword: async (req, res) => {
+        try {
+            const { password, confirm_password } = req.body;
+            if (password !== confirm_password) return res.status(400).json({ error: 'Passwords do not match.' })
+
+            const response = await userModel.findByIdAndUpdate(
+                { _id: req.user?._id },
+                { password: await bcrypt.hash(password, 10) },
+                { new: true }
+            )
+            if (!response) return res.status(400).json({ error: 'Something went wrong, please try again later.' })
+            return res.status(200).json({ success: 'Password Changed.' })
+        } catch (error) {
+            console.log('changeRecuriterPassword : ' + error.message)
+        }
+    },
+    deleteRecuirterInfo: async (req, res) => {
+        try {
+            const response = await userModel.findByIdAndDelete({ _id: req.user?._id }, { new: true })
+            if (!response) return res.status(404).json({ error: 'Not Found.' })
+
+            await deleteFile(`logo/${response.image}`)
+            return res.status(200).json({ redirect: '/login' })
+        } catch (error) {
+            console.log('deleteRecuirterInfo : ' + error.message)
+        }
+    },
 }
 
 export default usersControllers

@@ -5,12 +5,13 @@
                 <div class="order-confirm-sheet mb-50">
                     <div class="cart-total-section d-flex gap-3 align-items-center">
                         <div style="width: 150px;height: 150px;">
-                            <img src="/uploads/userInfo/<%= user.image %>" class="img-fluid"
-                                alt="<%= user.name %>" style="width: 150px;height: 150px;border-radius: 50%;">
+                            <img src="/uploads/logo/<%= user.image %>" class="img-fluid" alt="<%= user.companyName %>"
+                                style="width: 150px;height: 150px;border-radius: 50%;">
                         </div>
                         <div class="d-flex flex-column gap-1">
                             <h3 class="m-0">
-                                <%= user.name %>
+                                <%= user.companyName %>
+                                    <%# user.name %>
                             </h3>
                             <span>Member Since
                                 <% const memberSince=new Date(user.createdAt).toLocaleDateString() %>
@@ -25,17 +26,9 @@
                             <tbody>
                                 <tr class='border-bottom-0'>
                                     <th>
-                                        <a href="/profile/<%= user.name %>" class="text-dark">
-                                            <i class="fa-solid fa-user me-2"></i>
-                                            My Proflie
-                                        </a>
-                                    </th>
-                                </tr>
-                                <tr class='border-bottom-0'>
-                                    <th>
-                                        <a href="#" class="text-dark">
+                                        <a href="/recruiter/profile" class="text-dark">
                                             <i class="fa-solid fa-suitcase me-2"></i>
-                                            Applied Jobs
+                                            Profile
                                         </a>
                                     </th>
                                 </tr>
@@ -43,37 +36,21 @@
                                     <th>
                                         <a href="#" class="text-dark">
                                             <i class="fa-solid fa-bookmark me-2"></i>
-                                            Saved Jobs
+                                            Dashboard
                                         </a>
                                     </th>
                                 </tr>
                                 <tr class='border-bottom-0'>
                                     <th>
-                                        <a href="/profile/<%= user.name %>/projects" class="text-dark">
-                                            <i class="fa-solid fa-diagram-project me-2"></i>
-                                            Add Projects
+                                        <a href="#" class="text-dark">
+                                            <i class="fa-solid fa-bookmark me-2"></i>
+                                            Jobs
                                         </a>
                                     </th>
                                 </tr>
                                 <tr class='border-bottom-0'>
                                     <th>
-                                        <a href="/profile/<%= user.name %>/education" class="text-dark">
-                                            <i class="fa-solid fa-user-graduate me-2"></i>
-                                            Add Education
-                                        </a>
-                                    </th>
-                                </tr>
-                                <tr class='border-bottom-0'>
-                                    <th>
-                                        <a href="/profile/<%= user.name %>/experience" class="text-dark">
-                                            <i class="fa-solid fa-user me-2"></i>
-                                            Add Experience
-                                        </a>
-                                    </th>
-                                </tr>
-                                <tr class='border-bottom-0'>
-                                    <th>
-                                        <a href="/profile/settings" class="text-dark">
+                                        <a href="/recruiter/profile/settings" class="text-dark">
                                             <i class="fa-solid fa-screwdriver-wrench me-2"></i>
                                             Settings
                                         </a>

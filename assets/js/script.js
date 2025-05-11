@@ -383,7 +383,4 @@
             " - $" + $("#slider-range").slider("values", 1));
     });
 
-    AOS.init();
-
-
 })(jQuery);
