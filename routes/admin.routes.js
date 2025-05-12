@@ -11,11 +11,12 @@ router.get('/logout', (req, res, next) => {
     req.logout((err) => {
         if (err) return next(err)
         req.session.destroy(() => {
-            res.clearCookie('connect.sid'); // Adjust cookie name if needed
+            res.clearCookie('connect.sid')
             return res.redirect('/dashboard/login')
         })
     })
 })
+
 router.route('/login')
     .get((req, res) => res.render('admin/login', { layout: false, title: 'Login' }))
     .post((req, res, next) => {
@@ -90,7 +91,9 @@ router.patch('/user/:id', usersControllers.updateUserActiveStatus)
 router.delete('/user/:id', usersControllers.deleteuserInfo)
 
 //settings
-router.get('/setting/term&condition', adminControllers.renderTerms_CondtionPage)
+router.route('/setting/term&condition')
+    .get(adminControllers.renderTerms_CondtionPage)
+    .post(upload.none(), adminControllers.setSiteTerms)
 
 router.get('/*', (req, res) => res.status(404).render('admin/partials/NotFound', {
     layout: false,

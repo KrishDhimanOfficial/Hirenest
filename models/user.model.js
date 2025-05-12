@@ -8,7 +8,12 @@ const userSchema = new mongoose.Schema({
         trim: true,
     },
 
-    companyName: { type: String },
+    companyName: {
+        type: String,
+        required: [true, 'Company Name is required!'],
+        match: [/^[A-Za-z\s]{1,30}$/, 'Name must be 1-30 characters and only letters/spaces.'],
+        trim: true,
+    },
 
     email: {
         type: String,
@@ -87,20 +92,21 @@ const userSchema = new mongoose.Schema({
         }
     },
 
-    appliedJobs: { type: [mongoose.Schema.Types.ObjectId] },
-    savedJobs: { type: [mongoose.Schema.Types.ObjectId] },
-    userprojectIds: { type: [mongoose.Schema.Types.ObjectId] },
-
     isrecuiter: {
         type: Boolean,
         default: false
     },
-
+    
     isactive: {
         type: Boolean,
         default: true
-    }
-
+    },
+    
+    jobsId: { type: [mongoose.Schema.Types.ObjectId] },
+    appliedJobs: { type: [mongoose.Schema.Types.ObjectId] },
+    savedJobs: { type: [mongoose.Schema.Types.ObjectId] },
+    userprojectIds: { type: [mongoose.Schema.Types.ObjectId] },
+    
 }, { timestamps: true })
 
 

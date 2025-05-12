@@ -9,11 +9,22 @@ import userProfileRoutes from './site.user.profile.routes.js'
 import recuriterProfileRoutes from './site.recriter.profile.routes.js'
 const router = express.Router()
 
+
 router.get('/', siteControllers.renderHomePage)
+router.get('/terms&condition', siteControllers.renderTermsPage)
 router.route('/signup')
     .get((req, res) => res.render('layout/site', { body: '../site/signup', title: 'Signup', endApi: 'signup' }))
     .post(upload.none(), usersControllers.createUser)
 
+router.get('/logout', (req, res, next) => {
+    req.logout((err) => {
+        if (err) return next(err)
+        req.session.destroy(() => {
+            res.clearCookie('connect.sid')
+            return res.redirect('/login')
+        })
+    })
+})
 router.route('/login')
     .get((req, res) => res.render('layout/site', { body: '../site/login', title: 'Login', endApi: 'login' }))
     .post((req, res, next) => {
@@ -60,6 +71,9 @@ router.get('/api/cities', siteControllers.getcities)
 
 // Job skills
 router.get('/api/job-skills', siteControllers.getSkills)
+
+// Job Tags
+router.get('/api/job-skills', siteControllers.getTags)
 
 // Project
 router.route('/api/user/project/:id?')

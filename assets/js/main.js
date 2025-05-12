@@ -18,6 +18,19 @@ if (document.querySelector("#datatable")) $("#datatable").DataTable({
     "responsive": true,
 })
 
+if ($('#summernote')) $('#summernote').summernote({
+    height: 300, // Set editor height
+    tooltip: false,
+    toolbar: [
+        // [groupName, [list of button]]
+        ['style', ['style']],
+        ['font', ['bold', 'italic', 'underline', 'clear']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        ['insert', ['link',]],
+        ['view', ['fullscreen', 'codeview', 'help']]
+    ],
+})
+
 window.onload = () => {
     if (window.location.pathname === '/dashboard') Notify({ success: 'Welcome to HireNest' })
 }
@@ -36,6 +49,7 @@ document.onclick = (e) => {
         return TextINput.value = null
     }
 }
+
 document.onclick = (e) => {
     if (e.target.closest('.signup-btn.btn-1') &&
         e.target.type === 'submit' &&
@@ -148,9 +162,10 @@ $('.select2').each(function () {
     $select.select2({
         dropdownParent: $modal.length ? $modal : $(document.body)
     })
-})
+}) // Select 2 Initalization 
 
 let controller = null;
+let timeout = null;
 $('#countrySelect').on('select2:open', function () {
 
     setTimeout(() => {
@@ -221,26 +236,44 @@ $('#stateSelect').on('change', function () {
 })
 
 $('#jobskills').on('select2:open', function () {
+    let timeout;
+    let controller;
 
-    setTimeout(() => {
+    try {
         const $searchField = $('.select2-container--open .select2-search__field')
-        $searchField.off('input').on('input', async function () {
-            const searchTerm = $(this).val()
 
+        $searchField.off('input keyup') // Remove any existing handlers first
+        $searchField.on('input keyup', async function () {
+            const searchTerm = $(this).val().trim()
+
+            // Clear previous timeout and abort previous request
+            if (timeout) clearTimeout(timeout)
             if (controller) controller.abort()
 
-            controller = new AbortController()
-            const skills = await Fetch.get(`/api/job-skills?skill=${searchTerm}`, {}, controller.signal)
-            console.log(skills);
+            timeout = setTimeout(async () => {
+                controller = new AbortController()
+                try {
+                    const skills = await Fetch.get(`/api/job-skills?skill=${searchTerm}`, {}, controller.signal)
+                    const selectedValue = $('#jobskills').val() || []
 
-            // Add new options
-            skills.forEach(skill => {
-                const newOption = `<option value="${skill._id}">${skill.name}</option>`;
-                $('#jobskills').append(newOption)
-            })
-
-            // Refresh Select2 dropdown
-            $('#jobskills').trigger('change')
+                    // Add new options
+                    skills.forEach(skill => {
+                        if (!selectedValue.includes(skill._id)) {
+                            const newOption = `<option value="${skill._id}">${skill.name}</option>`;
+                            $('#jobskills').append(newOption)
+                        }
+                    })
+                    // Refresh Select2 dropdown
+                    $('#jobskills').trigger('change')
+                } catch (error) {
+                    console.error('Error fetching skills:', error)
+                }
+            }, 300)
         })
-    }, 500)
+    } catch (error) {
+        console.error('Error in select2 open handler:', error)
+    }
+}).on('select2:select', function () {
+    // Clear the search input after selection
+    $('.select2-search__field').val('')
 })

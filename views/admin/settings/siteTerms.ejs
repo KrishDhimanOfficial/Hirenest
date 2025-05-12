@@ -1,0 +1,36 @@
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-md-6">
+                <h1 class="mb-2">Site Terms & Condition</h1>
+                <ol class="breadcrumb float-sm-left">
+                    <li class="breadcrumb-item"><a href="/dashboard">Home</a></li>
+                    <li class="breadcrumb-item active">Settings - Terms & Condition</li>
+                </ol>
+            </div>
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form action="/dashboard/setting/term&condition" method="post" enctype="multipart/form-data">
+                            <h2 class="mb-3">Term & Condition</h2>
+                            <textarea placeholder="description" id="summernote" name="term_condition"
+                                spellcheck="false">
+                                <%= settings.term_condition %>
+                            </textarea>
+                            <button type="submit" class="btn btn-dark">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

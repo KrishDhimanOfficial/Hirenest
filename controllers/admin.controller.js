@@ -5,6 +5,7 @@ import jobTagModel from "../models/job.tag.model.js";
 import jobTypeModel from "../models/job.type.model.js";
 import skillModel from "../models/skill.model.js";
 import userModel from "../models/user.model.js";
+import site_settingsModel from "../models/site_settings.model.js";
 import handleAggregatePagination from "../services/handlepagePagination.js"
 
 const adminControllers = {
@@ -96,8 +97,27 @@ const adminControllers = {
     },
     renderTerms_CondtionPage: async (req, res) => {
         try {
+            const settings = await site_settingsModel.find({}, { term_condition: 1 })
+
+            return res.render('layout/admin',
+                {
+                    body: '../admin/settings/siteTerms',
+                    title: 'Dashboard | Term',
+                    settings: settings[0]
+                }
+            )
         } catch (error) {
             console.log('renderTerms_CondtionPage : ' + error.message)
+        }
+    },
+    setSiteTerms: async (req, res) => {
+        try {
+            const { term_condition } = req.body;
+            const response = await site_settingsModel.findByIdAndUpdate({ _id: '6821d1a9b57e33e4ce6ef864' }, { term_condition })
+            if (!response) res.status(400).redirect('/dashboard/setting/term&condition')
+            return res.status(200).redirect('/dashboard/setting/term&condition')
+        } catch (error) {
+            console.log('setSiteTerms : ' + error.message)
         }
     },
     renderUsers: async (req, res) => {

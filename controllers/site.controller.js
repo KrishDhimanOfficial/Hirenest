@@ -5,8 +5,25 @@ import userProjectModel from '../models/user.project.model.js'
 import handleAggregatePagination from '../services/handlepagePagination.js'
 import educationModel from '../models/education.model.js'
 import experienceModel from '../models/experience.model.js'
+import site_settingsModel from '../models/site_settings.model.js'
+import jobTagModel from '../models/job.tag.model.js'
 
 const siteControllers = {
+    renderTermsPage: async (req, res) => {
+        try {
+            const settings = await site_settingsModel.find({})
+            return res.render('layout/site',
+                {
+                    body: '../site/term',
+                    title: 'Terms & Condition',
+                    user: req.user,
+                    setting: settings[0]
+                }
+            )
+        } catch (error) {
+            console.log('renderTermsPage : ' + error.message)
+        }
+    },
     renderHomePage: async (req, res) => {
         try {
             return res.render('layout/site',
@@ -76,9 +93,28 @@ const siteControllers = {
                     }
                 }
             ])
+
             return res.status(200).json(response)
         } catch (error) {
             console.log('getSkills : ' + error.message)
+        }
+    },
+    getTags: async (req, res) => {
+        try {
+            const response = await jobTagModel.aggregate([
+                {
+                    $match: {
+                        name: {
+                            $regex: req.query.tag, $options: 'i'
+                        },
+                        status: true
+                    }
+                }
+            ])
+
+            return res.status(200).json(response)
+        } catch (error) {
+            console.log('getTags : ' + error.message)
         }
     },
     renderUserDashboard: async (req, res) => {
@@ -282,6 +318,56 @@ const siteControllers = {
                 })
         } catch (error) {
             console.log('renderRecuriterSettings : ' + error.message)
+        }
+    },
+    renderRecuriterDashBoard: async (req, res) => {
+        try {
+
+            return res.render('layout/site',
+                {
+                    body: '../site/recuriter/dashboard',
+                    profilelayout: './dashboardoptions',
+                    title: `Profile - ${req.user?.companyName}`,
+                    user: req.user,
+                    // endApi: 'api/recruiter',
+                })
+        } catch (error) {
+            console.log('renderRecuriterDashBoard : ' + error.message)
+        }
+    },
+    renderJobsPage: async (req, res) => {
+        try {
+            return res.render('layout/site',
+                {
+                    body: '../site/recuriter/dashboard',
+                    profilelayout: './jobs',
+                    title: `Profile - ${req.user?.companyName}`,
+                    user: req.user,
+                    // endApi: 'api/recruiter',
+                })
+        } catch (error) {
+            console.log('renderJobsPage : ' + error.message)
+        }
+    },
+    renderAddJobPage: async (req, res) => {
+        try {
+            const country = req.user?.location.country;
+            const state = req.user?.location.state;
+            const city = req.user?.location.city;
+
+            return res.render('layout/site',
+                {
+                    body: '../site/recuriter/dashboard',
+                    profilelayout: './createJob',
+                    title: `Profile - ${req.user?.companyName}`,
+                    user: req.user,
+                    // endApi: 'api/recruiter',
+                    country: Country.getCountryByCode(country),
+                    state: State.getStateByCodeAndCountry(state, country),
+                    city: City.getCitiesOfState(country, state).filter(c => c.name === city)[0]
+                })
+        } catch (error) {
+            console.log('renderAddJobPage : ' + error.message)
         }
     },
 }

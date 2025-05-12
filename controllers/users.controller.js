@@ -61,12 +61,12 @@ const usersControllers = {
             const docToBeupdate = {
                 name, phone, gender,
                 location: { address, country, state, city },
-                skills: skills.map(id => new ObjectId(id)),
                 bio, url
             }
 
             if (req.files['image']) docToBeupdate.image = req.files['image'][0].filename
             if (req.files['resume']) docToBeupdate.resume = req.files['resume'][0].filename.replace('.pdf', '.zip')
+            if (skills) docToBeupdate.skills = skills.map(id => new ObjectId(id))
 
             const response = await userModel.findByIdAndUpdate(
                 { _id: req.user?._id },
