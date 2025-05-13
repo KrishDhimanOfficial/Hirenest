@@ -14,6 +14,38 @@
                 <div class="table-responsive">
                     <table class="table">
                         <tbody id="table-grid">
+                            <% jobs.collectionData?.forEach(job=> { %>
+                                <tr>
+                                    <td class="product-info d-flex justify-content-between">
+                                        <div>
+                                            <a href="<%= job._id %>" class="product-name" target="_blank">
+                                                <%= job.jobTitle %>
+                                            </a>
+                                            <ul class="style-none">
+                                                <li class="size">
+                                                    Exprie on <%= job.expireDate %>
+                                                </li>
+                                                <li>
+                                                    <span class="badge rounded-pill <%= job.status ? 'text-bg-success' :'text-bg-danger' %>">
+                                                        <%= job.status ? 'Active' :'InActive' %>
+                                                    </span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <a href="/recruiter/update/job/<%= job._id %>" class="btn btn-dark bg-transparent projectedit">
+                                                <i class="fa-solid fa-edit text-dark"></i>
+                                            </a>
+
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-danger"
+                                                data-id="<%= job._id %>"
+                                                class="btn btn-dark bg-transparent danger-modal">
+                                                <i class="fa-solid fa-trash text-dark" data-id="<%= job._id %>"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <% }) %>
                         </tbody>
                     </table>
                     <!-- pagination -->
@@ -22,49 +54,5 @@
         </div>
     </div>
 </div>
-<input type="hidden" id="endapi" value="<%# endApi %>">
-<!-- <div class="modal fade" id="openJobsmodal" tabindex="-1" aria-labelledby="openJobsmodal" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content p-5">
-            <form id="submitForm" class="checkout-form">
-                <h2 id="Jobshead">Jobs</h2>
-                <div class="row">
-                    <div class="col-lg-6">
-                        <label>Course Name</label>
-                        <input type="text" placeholder="Enter Course Name" id="courseName" name="courseName"
-                            class="single-input-wrapper">
-                    </div>
-                    <div class="col-lg-6">
-                        <label>Specialization</label>
-                        <input type="text" placeholder="Enter Specialization" id="specializedField"
-                            name="specializedField" class="single-input-wrapper">
-                    </div>
-                    <div class="col-lg-6">
-                        <label>Start Date</label>
-                        <input type="date" id="startDate" name="startDate" class="single-input-wrapper">
-                    </div>
-                    <div class="col-lg-6">
-                        <label>End Date</label>
-                        <input type="date" id="endDate" name="endDate" class="single-input-wrapper">
-                    </div>
-                    <div class="col-lg-6">
-                        <label>School/University</label>
-                        <input type="text" placeholder="Enter your School OR University" id="schoolORUniversity"
-                            name="schoolORUniversity" class="single-input-wrapper">
-                    </div>
-                    <div class="col-12 other-note-area">
-                        <label>Description</label>
-                        <textarea placeholder="description" id="description" name="description"
-                            spellcheck="false"></textarea>
-                    </div>
-                    <div class="col signup-form">
-                        <div class="submit-btn">
-                            <Button id="submitFormBtn" type="submit" class="signup-btn btn-1">Submit</Button>
-                        </div>
-                    </div> 
-                </div> 
-        </div>
-    </div>
-    </form>
-</div> -->
+
 <%- include('../partials/deleteObjectModal') %>

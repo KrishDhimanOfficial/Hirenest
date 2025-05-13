@@ -7,6 +7,12 @@ import educationModel from '../models/education.model.js'
 import experienceModel from '../models/experience.model.js'
 import site_settingsModel from '../models/site_settings.model.js'
 import jobTagModel from '../models/job.tag.model.js'
+import jobTypeModel from '../models/job.type.model.js'
+import jobCategoryModel from '../models/job.category.model.js'
+import jobDegreeModel from '../models/job.degree.model.js'
+import jobIndustryTypeModel from '../models/job.industry.type.model.js'
+import mongoose from 'mongoose'
+import jobModel from '../models/job.model.js'
 
 const siteControllers = {
     renderTermsPage: async (req, res) => {
@@ -107,6 +113,26 @@ const siteControllers = {
                         name: {
                             $regex: req.query.tag, $options: 'i'
                         },
+                    }
+                }
+            ])
+            console.log(response);
+
+            return res.status(200).json(response)
+        } catch (error) {
+            console.log('getTags : ' + error.message)
+        }
+    },
+    getcategories: async (req, res) => {
+        try {
+            const response = await jobCategoryModel.aggregate([
+                {
+                    $match: {
+                        name: {
+                            $regex: req.query.category,
+                            $options: 'i'
+                        },
+                        industryId: new mongoose.Types.ObjectId(req.query.industryId),
                         status: true
                     }
                 }
@@ -114,7 +140,26 @@ const siteControllers = {
 
             return res.status(200).json(response)
         } catch (error) {
-            console.log('getTags : ' + error.message)
+            console.log('getcategories : ' + error.message)
+        }
+    },
+    getdegrees: async (req, res) => {
+        try {
+            const response = await jobDegreeModel.aggregate([
+                {
+                    $match: {
+                        name: {
+                            $regex: req.query.degree,
+                            $options: 'i'
+                        },
+                        status: true
+                    }
+                }
+            ])
+
+            return res.status(200).json(response)
+        } catch (error) {
+            console.log('getdegrees  : ' + error.message)
         }
     },
     renderUserDashboard: async (req, res) => {
@@ -337,13 +382,53 @@ const siteControllers = {
     },
     renderJobsPage: async (req, res) => {
         try {
+            const months = ["January", "February", "March", "April", "May"
+                , "June", "July", "August", "September", "October", "November"
+                , "December"]
+
+            const pipeline = [
+                {
+                    $match: { recuriterId: req.user?._id }
+                },
+                {
+                    $addFields: {
+                        endDay: { $dayOfMonth: "$expireDate" },
+                        endMonth: { $month: "$expireDate" },
+                        endYear: { $year: "$expireDate" }
+                    }
+                },
+                {
+                    $addFields: {
+                        expireDate: {
+                            $concat: [
+                                { $toString: "$endDay" },
+                                " ",
+                                {
+                                    $arrayElemAt: [months, "$endMonth"]
+                                },
+                                ", ",
+                                { $toString: "$endYear" }
+                            ]
+                        }
+                    }
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        status: 1,
+                        expireDate: 1,
+                        jobTitle: 1,
+                    }
+                }
+            ]
+            const jobs = await handleAggregatePagination(jobModel, pipeline, req.query)
             return res.render('layout/site',
                 {
                     body: '../site/recuriter/dashboard',
                     profilelayout: './jobs',
                     title: `Profile - ${req.user?.companyName}`,
                     user: req.user,
-                    // endApi: 'api/recruiter',
+                    jobs
                 })
         } catch (error) {
             console.log('renderJobsPage : ' + error.message)
@@ -355,19 +440,122 @@ const siteControllers = {
             const state = req.user?.location.state;
             const city = req.user?.location.city;
 
+            const [jobtypes, jobtindustries] = await Promise.all([
+                jobTypeModel.find({ status: true }),
+                jobIndustryTypeModel.find({ status: true })
+            ])
+
             return res.render('layout/site',
                 {
                     body: '../site/recuriter/dashboard',
                     profilelayout: './createJob',
                     title: `Profile - ${req.user?.companyName}`,
                     user: req.user,
-                    // endApi: 'api/recruiter',
+                    jobtypes,
+                    jobtindustries,
+                    endApi: 'api/recruiter/create-job',
                     country: Country.getCountryByCode(country),
                     state: State.getStateByCodeAndCountry(state, country),
                     city: City.getCitiesOfState(country, state).filter(c => c.name === city)[0]
                 })
         } catch (error) {
             console.log('renderAddJobPage : ' + error.message)
+        }
+    },
+    renderUpdateJobPage: async (req, res) => {
+        try {
+            const country = req.user?.location.country;
+            const state = req.user?.location.state;
+            const city = req.user?.location.city;
+            const pipeline = [
+                {
+                    $match: {
+                        _id: new mongoose.Types.ObjectId(req.params.id),
+                        recuriterId: req.user?._id
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'job_categories',
+                        localField: 'categoryId',
+                        foreignField: '_id',
+                        as: 'category'
+                    }
+                },
+                {
+                    $unwind: '$category'
+                },
+                {
+                    $lookup: {
+                        from: 'jobindustrytypes',
+                        localField: 'industryId',
+                        foreignField: '_id',
+                        as: 'industry'
+                    }
+                },
+                {
+                    $unwind: '$jobindustry'
+                },
+                {
+                    $lookup: {
+                        from: 'degrees',
+                        localField: 'degreeId',
+                        foreignField: '_id',
+                        as: 'degree'
+                    }
+                },
+                {
+                    $unwind: '$degree'
+                },
+                {
+                    $lookup: {
+                        from: 'jobtypes',
+                        localField: 'jobTypeId',
+                        foreignField: '_id',
+                        as: 'jobTypes'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'jobskills',
+                        localField: 'skills',
+                        foreignField: '_id',
+                        as: 'skills'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'jobtags',
+                        localField: 'tags',
+                        foreignField: '_id',
+                        as: 'tags'
+                    }
+                },
+            ]
+
+            const [jobtypes, jobtindustries, job] = await Promise.all([
+                jobTypeModel.find({ status: true }),
+                jobIndustryTypeModel.find({ status: true }),
+                jobModel.aggregate(pipeline)
+            ])
+            console.log(job);
+
+            return res.render('layout/site',
+                {
+                    body: '../site/recuriter/dashboard',
+                    profilelayout: './createJob',
+                    title: `Profile - ${req.user?.companyName}`,
+                    user: req.user,
+                    jobtypes,
+                    jobtindustries,
+                    job,
+                    endApi: 'api/recruiter/create-job',
+                    country: Country.getCountryByCode(country),
+                    state: State.getStateByCodeAndCountry(state, country),
+                    city: City.getCitiesOfState(country, state).filter(c => c.name === city)[0]
+                })
+        } catch (error) {
+            console.log('renderUpdateJobPage : ' + error.message)
         }
     },
 }

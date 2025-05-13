@@ -7,10 +7,16 @@ export const siteForm = document.querySelector('#updateFormSite') || document.qu
 export const confirmDeleteBtn = document.querySelector('#confirmDeleteBtn')
 export const previewImgTag = document.querySelector('#previewImg')
 const stillworkingCheck = document.querySelector('#new-account')
+const hideSalary = document.querySelector('#hideSalary')
 import Fetch from './fetch.js'
 
 if (stillworkingCheck) stillworkingCheck.onclick = (e) => {
     document.querySelector('#endDate').disabled = e.target.checked;
+}
+
+if (hideSalary) hideSalary.onclick = (e) => {
+    document.querySelector('#amount').disabled = e.target.checked;
+    document.querySelector('#slider-range').classList.toggle('hide')
 }
 
 export const Notify = (data) => {
@@ -28,6 +34,14 @@ export const updatetableData = async (api) => {
     const res = await Fetch.get(api)
     Form.dataset.id = res._id;
     TextINput.value = res.name;
+
+    if (document.querySelector('#jobIndustries')) {
+        Array.from(document.querySelector('#jobIndustries').options).forEach(option => {
+            if (String(option.value) === String(res.industry._id)) {
+                option.selected = true;
+            }
+        })
+    }
 }
 export const updatetableDataStatus = async (status, api) => {
     try {
@@ -125,4 +139,53 @@ export const updateuserexperience = async (api) => {
     } catch (error) {
         console.error(error)
     }
+}
+
+export const MultiSelectInit = (selector, api) => {
+    $(selector).on('select2:open', function () {
+        let timeout;
+        let controller;
+
+        try {
+            const $searchField = $('.select2-container--open .select2-search__field')
+
+            $searchField.off('input keyup')
+            $searchField.on('input keyup', async function () {
+                const searchTerm = $(this).val().trim()
+
+                if (timeout) clearTimeout(timeout)
+                if (controller) controller.abort()
+
+                timeout = setTimeout(async () => {
+                    controller = new AbortController()
+
+                    try {
+                        const responseArray = await Fetch.get(`${api}=${searchTerm}`, {}, controller.signal);
+                        const selectedValue = $(selector).val() || [];
+
+                        // Remove previous unselected options
+                        $(selector).find('option:not(:selected)').remove()
+
+                        responseArray.forEach(item => {
+                            if (!selectedValue.includes(item._id)) {
+                                const newOption = new Option(item.name, item._id, false, false)
+                                $(selector).append(newOption);
+                            }
+                        })
+
+                        $(selector).trigger('change.select2')
+
+                        // Restore search field focus
+                        setTimeout(() => {
+                            $searchField.focus().trigger('input')
+                        }, 0)
+                    } catch (error) {
+                        console.error('Error fetching responseArray:', error)
+                    }
+                }, 300)
+            })
+        } catch (error) {
+            console.error('Error in select2 open handler:', error)
+        }
+    })
 }

@@ -87,8 +87,19 @@
             </div>
             <div class="modal-body">
                 <form id="submitForm" class="form">
+                    <label> Category </label>
                     <div class="inputForm">
                         <input placeholder="Enter Job Category" name="name" id="TextINput" class="input" type="text">
+                    </div>
+                    <label> Category Industry </label>
+                    <div class="inputForm">
+                        <select name="industryId" id="jobIndustries" style="width: 100%; border: none;">
+                            <% jobIndustries.forEach(jobIndustry=> { %>
+                                <option value="<%= jobIndustry._id %>">
+                                    <%= jobIndustry.name %>
+                                </option>
+                                <% }) %>
+                        </select>
                     </div>
                     <button id="submitFormBtn" type="submit" class="button-submit">Submit</button>
                 </form>

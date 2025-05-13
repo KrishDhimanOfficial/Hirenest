@@ -2,22 +2,24 @@ import mongoose from "mongoose"
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2"
 
 const jobCategorySchema = new mongoose.Schema({
+    industryId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: [true, 'Select Category Industry .'],
+    },
     name: {
         type: mongoose.Schema.Types.String,
         unique: true,
         required: [true, 'Input Field is required.'],
         trim: [true, 'Input Field contains spaces.'],
-        match: [/[A-Za-z\s]/, 'Invalid Input Field.'],
-        maxlength: [15, 'Name must be at least 15 characters long.']
+        match: [/[A-Za-z\s]{5,15}/, 'Invalid Input Field.'],
+
     },
     slug: {
         type: mongoose.Schema.Types.String,
         unique: true,
         required: [true, 'Input Slug Field is required.'],
         trim: [true, 'Input Slug Field contains spaces.'],
-        match: [/[a-z\s]/, 'Invalid Slug.'],
-        maxlength: [15, 'Slug must be at least 15 characters long.']
-
+        match: [/[a-z\s]{5,15}/, 'Invalid Slug.'],
     },
     status: {
         type: mongoose.Schema.Types.Boolean,

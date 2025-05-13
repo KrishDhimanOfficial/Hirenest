@@ -7,6 +7,7 @@ import { checkIsCandidate, checkIsRecruiter } from '../middleware/authentication
 import handlemulterError from '../middleware/handleMulterErrors.js'
 import userProfileRoutes from './site.user.profile.routes.js'
 import recuriterProfileRoutes from './site.recriter.profile.routes.js'
+import jobControllers from '../controllers/job.controller.js'
 const router = express.Router()
 
 
@@ -69,11 +70,11 @@ router.get('/api/countries', siteControllers.getCounteries)
 router.get('/api/states', siteControllers.getStates)
 router.get('/api/cities', siteControllers.getcities)
 
-// Job skills
-router.get('/api/job-skills', siteControllers.getSkills)
 
-// Job Tags
-router.get('/api/job-skills', siteControllers.getTags)
+router.get('/api/job-skills', siteControllers.getSkills) // Job skills
+router.get('/api/job-tags', siteControllers.getTags) // Job Tags
+router.get('/api/job-categories', siteControllers.getcategories) // Job Categories
+router.get('/api/job-degrees', siteControllers.getdegrees) // Job Categories
 
 // Project
 router.route('/api/user/project/:id?')
@@ -100,6 +101,10 @@ router.route('/api/recruiter')
     .put(companylogo.single('image'), handlemulterError, usersControllers.updateRecruiterInfo)
     .patch(upload.none(), usersControllers.changeRecuriterPassword)
     .delete(usersControllers.deleteRecuirterInfo)
+
+router.route('/api/recruiter/create-job/:id?')
+    .post(upload.none(), jobControllers.createJob)
+    .delete(jobControllers.deleteJob)
 
 router.use('/profile', checkIsCandidate, userProfileRoutes)
 router.use('/recruiter', checkIsRecruiter, recuriterProfileRoutes)

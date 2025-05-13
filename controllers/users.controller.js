@@ -1,6 +1,6 @@
 import userModel from "../models/user.model.js"
 import bcrypt from 'bcrypt'
-import { parseISO, format } from 'date-fns'
+import { parseISO } from 'date-fns'
 import validate from "../services/validate.js"
 import userProjectModel from "../models/user.project.model.js"
 import mongoose from "mongoose";

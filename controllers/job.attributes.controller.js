@@ -6,20 +6,22 @@ import jobDegreeModel from "../models/job.degree.model.js";
 import jobIndustryTypeModel from "../models/job.industry.type.model.js";
 import jobTypeModel from "../models/job.type.model.js";
 import jobTagModel from "../models/job.tag.model.js";
-import mongoose from "mongoose";
+import mongoose, { Mongoose } from "mongoose";
 import skillModel from "../models/skill.model.js";
 const validateId = mongoose.Types.ObjectId.isValid;
 
 const jobAttributesController = {
     createJob_category: async (req, res) => {
         try {
-            const { name } = req.body;
-            const checkExstence = await jobCategoryModel.findOne({ name })
+            const { name, industryId } = req.body;
+            if (!validateId(industryId)) return res.status(400).json({ error: 'Select Category Industry.' })
 
+            const checkExstence = await jobCategoryModel.findOne({ name })
             if (checkExstence) return res.status(400).json({ error: `${name} Category Exists.` })
 
             const response = await jobCategoryModel.create({
                 name,
+                industryId: new mongoose.Types.ObjectId(industryId),
                 slug: slugify(name, {
                     replacement: '-',
                     lower: true,
@@ -37,9 +39,23 @@ const jobAttributesController = {
         try {
             if (!validateId(req.params.id)) return res.status(400).json({ error: 'Invalid Request.' })
 
-            const response = await jobCategoryModel.findById({ _id: req.params.id })
+            const response = await jobCategoryModel.aggregate([
+                {
+                    $match: { _id: new mongoose.Types.ObjectId(req.params.id) }
+                },
+                {
+                    $lookup: {
+                        from: 'jobindustrytypes',
+                        localField: 'industryId',
+                        foreignField: '_id',
+                        as: 'industry'
+                    }
+                },
+                { $unwind: '$industry' }
+            ])
+            
             if (!response) return res.status(404).json({ error: 'Not Found.' })
-            return res.status(200).json(response)
+            return res.status(200).json(response[0])
         } catch (error) {
             console.log('getSingle_job_category  : ' + error.message)
         }
@@ -47,13 +63,16 @@ const jobAttributesController = {
     updateJob_category: async (req, res) => {
         try {
             if (!validateId(req.params.id)) return res.status(400).json({ error: 'Invalid Request.' })
-            console.log(req.body);
+            // console.log(req.body);
 
-            const { name, status } = req.body;
+            const { name, industryId } = req.body;
+            if (!validateId(industryId)) return res.status(400).json({ error: 'Select Category Industry.' })
+
             const response = await jobCategoryModel.findByIdAndUpdate(
                 { _id: req.params.id },
                 {
                     name,
+                    industryId: new mongoose.Types.ObjectId(industryId),
                     slug: slugify(name, {
                         replacement: '-',
                         lower: true,

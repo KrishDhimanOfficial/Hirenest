@@ -36,12 +36,17 @@ const adminControllers = {
     },
     renderJobCategory: async (req, res) => {
         try {
-            const response = await jobCategoryModel.find({})
+            const [response1, response2] = await Promise.all([
+                jobCategoryModel.find({}),
+                jobIndustryTypeModel.find({ status: true })
+            ])
+
             return res.render('layout/admin',
                 {
                     body: '../admin/jobcategory/category',
                     title: 'Hirenest | Dashboard',
-                    categories: response,
+                    categories: response1,
+                    jobIndustries: response2,
                     endApi: 'dashboard/job-category'
                 }
             )

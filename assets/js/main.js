@@ -1,7 +1,7 @@
 import {
     Form, Notify, siteForm, TextINput, confirmDeleteBtn, updatetableData, submitFormBtn, datatable, deletebtn,
     handleDeleteRequest, updatetableDataStatus, previewImage, updateuserProject, updateusereducation,
-    updateuserexperience
+    updateuserexperience, MultiSelectInit
 } from './variable.js'
 import Fetch from './fetch.js'
 
@@ -160,7 +160,8 @@ $('.select2').each(function () {
     const $modal = $select.closest('.modal');
 
     $select.select2({
-        dropdownParent: $modal.length ? $modal : $(document.body)
+        dropdownParent: $modal.length ? $modal : $(document.body),
+        placeholder: 'Select an option'
     })
 }) // Select 2 Initalization 
 
@@ -235,45 +236,133 @@ $('#stateSelect').on('change', function () {
     })
 })
 
-$('#jobskills').on('select2:open', function () {
-    let timeout;
+$('#categorySelect').on('select2:open', function () {
     let controller;
+    let timeout;
 
-    try {
-        const $searchField = $('.select2-container--open .select2-search__field')
+    const $searchField = $('.select2-container--open .select2-search__field');
 
-        $searchField.off('input keyup') // Remove any existing handlers first
-        $searchField.on('input keyup', async function () {
-            const searchTerm = $(this).val().trim()
+    $searchField.off('input').on('input', function () {
+        const searchTerm = $(this).val().trim()
 
-            // Clear previous timeout and abort previous request
-            if (timeout) clearTimeout(timeout)
-            if (controller) controller.abort()
+        if (controller) controller.abort()
+        if (timeout) clearTimeout(timeout)
 
-            timeout = setTimeout(async () => {
-                controller = new AbortController()
-                try {
-                    const skills = await Fetch.get(`/api/job-skills?skill=${searchTerm}`, {}, controller.signal)
-                    const selectedValue = $('#jobskills').val() || []
+        timeout = setTimeout(async () => {
+            controller = new AbortController()
 
-                    // Add new options
-                    skills.forEach(skill => {
-                        if (!selectedValue.includes(skill._id)) {
-                            const newOption = `<option value="${skill._id}">${skill.name}</option>`;
-                            $('#jobskills').append(newOption)
-                        }
-                    })
-                    // Refresh Select2 dropdown
-                    $('#jobskills').trigger('change')
-                } catch (error) {
-                    console.error('Error fetching skills:', error)
+            try {
+                const industryId = $('#jobtindustries').val()
+                const categories = await Fetch.get(
+                    `/api/job-categories?category=${encodeURIComponent(searchTerm)}&industryId=${industryId}`,
+                    {},
+                    controller.signal
+                );
+
+                const selected = $('#categorySelect').val()
+
+                $('#categorySelect').empty()
+
+                categories.forEach(category => {
+                    const option = new Option(category.name, category._id, false, selected === category._id)
+                    $('#categorySelect').append(option)
+                });
+
+                $('#categorySelect').trigger('change.select2');
+            } catch (error) {
+                if (error.name !== 'AbortError') {
+                    console.error('Fetch error:', error);
                 }
-            }, 300)
-        })
-    } catch (error) {
-        console.error('Error in select2 open handler:', error)
-    }
-}).on('select2:select', function () {
-    // Clear the search input after selection
-    $('.select2-search__field').val('')
+            }
+        }, 300)
+    })
 })
+$('#jobDegree').on('select2:open', function () {
+    let controller;
+    let timeout;
+
+    const $searchField = $('.select2-container--open .select2-search__field');
+
+    $searchField.off('input').on('input', function () {
+        const searchTerm = $(this).val().trim()
+
+        if (controller) controller.abort()
+        if (timeout) clearTimeout(timeout)
+
+        timeout = setTimeout(async () => {
+            controller = new AbortController()
+
+            try {
+                const degrees = await Fetch.get(
+                    `/api/job-degrees?degree=${encodeURIComponent(searchTerm)}`,
+                    {},
+                    controller.signal
+                );
+
+                const selected = $('#jobDegree').val()
+
+                $('#jobDegree').empty()
+
+                degrees.forEach(degree => {
+                    const option = new Option(degree.name, degree._id, false, selected === degree._id)
+                    $('#jobDegree').append(option)
+                });
+
+                $('#jobDegree').trigger('change.select2')
+            } catch (error) {
+                if (error.name !== 'AbortError') {
+                    console.error('Fetch error:', error);
+                }
+            }
+        }, 300)
+    })
+})
+
+MultiSelectInit('#jobskills', '/api/job-skills?skill')
+MultiSelectInit('#jobTags', '/api/job-tags?tag')
+// $('#jobTags').on('select2:open', function () {
+//     let timeout;
+//     let controller;
+
+//     try {
+//         const $searchField = $('.select2-container--open .select2-search__field')
+
+//         $searchField.off('input keyup')
+//         $searchField.on('input keyup', async function () {
+//             const searchTerm = $(this).val().trim()
+
+//             if (timeout) clearTimeout(timeout)
+//             if (controller) controller.abort()
+
+//             timeout = setTimeout(async () => {
+//                 controller = new AbortController()
+
+//                 try {
+//                     const responseArray = await Fetch.get(`/api/job-tags?tag=${encodeURIComponent(searchTerm)}`, {}, controller.signal);
+//                     const selectedValue = $('#jobTags').val() || [];
+
+//                     // Remove previous unselected options
+//                     $('#jobTags').find('option:not(:selected)').remove()
+
+//                     responseArray.forEach(item => {
+//                         if (!selectedValue.includes(item._id)) {
+//                             const newOption = new Option(item.name, item._id, false, false)
+//                             $('#jobTags').append(newOption);
+//                         }
+//                     })
+
+//                     $('#jobTags').trigger('change.select2')
+
+//                     // Restore search field focus
+//                     setTimeout(() => {
+//                         $searchField.focus().trigger('input')
+//                     }, 0)
+//                 } catch (error) {
+//                     console.error('Error fetching responseArray:', error)
+//                 }
+//             }, 300)
+//         })
+//     } catch (error) {
+//         console.error('Error in select2 open handler:', error)
+//     }
+// })

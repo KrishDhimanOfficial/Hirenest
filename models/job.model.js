@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 
 const jobSchema = new mongoose.Schema({
     jobTitle: {
@@ -6,27 +7,39 @@ const jobSchema = new mongoose.Schema({
         required: [true, 'Job title is required'],
         trim: true
     },
-    category: {
+    categoryId: {
         type: mongoose.Schema.Types.ObjectId,
         required: [true, 'Job category is required'],
         trim: true
     },
-    jobType: {
+    industryId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: [true, 'Job industry is required'],
+        trim: true
+    },
+    jobTypeId: {
         type: [mongoose.Schema.Types.ObjectId],
-        required: [true, 'Job type is required']
+        required: [true, 'Job type is required'],
+        validate: {
+            validator: v => Array.isArray(v) && v.length > 1,
+            message: 'At least 1-2 Job Type is required'
+        }
     },
     skills: {
         type: [mongoose.Schema.Types.ObjectId],
         validate: {
-            validator: v => Array.isArray(v) && v.length > 0,
-            message: 'At least one skill is required'
+            validator: v => Array.isArray(v) && v.length > 1,
+            message: 'At least 1-2 skill is required'
         }
     },
     tags: {
         type: [mongoose.Schema.Types.ObjectId],
-        default: []
+        validate: {
+            validator: v => Array.isArray(v) && v.length > 1,
+            message: 'At least 1-2 Tag is required'
+        }
     },
-    degree: {
+    degreeId: {
         type: mongoose.Schema.Types.ObjectId,
     },
     postDate: {
@@ -52,8 +65,18 @@ const jobSchema = new mongoose.Schema({
         }
     },
     salary: {
-        type: Number,
-        min: [0, 'Invalid Salary Input Field.']
+        type: {
+            min: Number,
+            max: Number,
+        },
+        _id: false,
+        required: [
+            () => !this?.hideSalary,
+            'salary is required.'
+        ],
+        set: (v) => {
+            return v ? v : undefined
+        }
     },
     hideSalary: {
         type: Boolean,
@@ -65,21 +88,21 @@ const jobSchema = new mongoose.Schema({
         default: 'Monthly'
     },
     experience: {
-        type: String,
-        required: [true, 'Experience is required']
-    }, // TODO : setting proper validation
-    location: {
         type: {
-            country: { type: String, trim: true },
-            state: { type: String, trim: true },
-            city: { type: String, trim: true },
-            address: {
-                type: String, trim: true,
-                maxlength: [100, 'Address too long.']
-            },
+            min: Number,
+            max: Number,
         },
-        _id: false
-    },
+        _id: false,
+        required: [true, 'Experience is required']
+    }, 
+    // location: {
+    //     type: {
+    //         country: { type: String, trim: true },
+    //         state: { type: String, trim: true },
+    //         city: { type: String, trim: true },
+    //     },
+    //     _id: false
+    // },
     shortDesc: {
         type: String,
         required: [true, 'Short description is required'],
@@ -90,10 +113,16 @@ const jobSchema = new mongoose.Schema({
         required: [true, 'Job description is required']
     },
     status: {
-        type: String,
-        enum: ['Active', 'Inactive', 'Closed'],
-        default: 'Active'
+        type: Boolean,
+    },
+    recuriterId: {
+        type: mongoose.Schema.Types.ObjectId,
+        unquie: true
+    },
+    appliedusersId: {
+        type: [mongoose.Schema.Types.ObjectId],
     }
 }, { timestamps: true })
 
+jobSchema.plugin(mongooseAggregatePaginate)
 export default mongoose.model('Job', jobSchema)
