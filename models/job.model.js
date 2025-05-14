@@ -59,7 +59,9 @@ const jobSchema = new mongoose.Schema({
         },
         validate: {
             validator: function (v) {
-                return v > this.postDate;
+                const postDate = this.get('postDate')
+                if (!v || !postDate) return false;
+                return v.getTime() > postDate.getTime()
             },
             message: 'Expire date must be after post date'
         }
@@ -88,21 +90,13 @@ const jobSchema = new mongoose.Schema({
         default: 'Monthly'
     },
     experience: {
-        type: {
-            min: Number,
-            max: Number,
-        },
-        _id: false,
+        type: Number,
         required: [true, 'Experience is required']
-    }, 
-    // location: {
-    //     type: {
-    //         country: { type: String, trim: true },
-    //         state: { type: String, trim: true },
-    //         city: { type: String, trim: true },
-    //     },
-    //     _id: false
-    // },
+    },
+    currency: {
+        symbol: String,
+        name: String
+    },
     shortDesc: {
         type: String,
         required: [true, 'Short description is required'],
@@ -114,6 +108,10 @@ const jobSchema = new mongoose.Schema({
     },
     status: {
         type: Boolean,
+    },
+    openings: {
+        type: Number,
+        required: [true, 'Jobs Opening is required']
     },
     recuriterId: {
         type: mongoose.Schema.Types.ObjectId,

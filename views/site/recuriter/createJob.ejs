@@ -84,13 +84,21 @@
                                 <div class="col-lg-6 mb-3">
                                     <label>Job Experience</label>
                                     <select class="single-input-wrapper" name="experience" style="width: 100%;">
-                                        <option value="0-6">0-6 months</option>
-                                        <option value="0-1">0-1 year</option>
-                                        <option value="1-2">1-2 year</option>
-                                        <option value="2-3">2-3 year</option>
-                                        <option value="3-4">3-4 year</option>
-                                        <option value="4-5">4-5 year</option>
-                                        <option value="5">Above 5 year</option>
+                                        <% for( let i=1; i <=10; ++i ) { %>
+                                            <option value="<%= i %>">
+                                                <%= i %> year
+                                            </option>
+                                            <% } %>
+                                    </select>
+                                </div>
+                                <div class="col-lg-6 mb-3">
+                                    <label>Job Openings</label>
+                                    <select class="single-input-wrapper" name="openings" style="width: 100%;">
+                                        <% for( let i=1; i <=15; ++i ) { %>
+                                            <option value="<%= i %>">
+                                                <%= i %> year
+                                            </option>
+                                            <% } %>
                                     </select>
                                 </div>
                                 <div class="col-lg-6 mb-3">
@@ -126,7 +134,8 @@
                                 </div>
                                 <div class="col-12 signup-form">
                                     <div class="submit-btn">
-                                        <Button id="submitFormBtn" type="submit" class="signup-btn btn-1">Submit</Button>
+                                        <Button id="submitFormBtn" type="submit"
+                                            class="signup-btn btn-1">Submit</Button>
                                     </div>
                                 </div>
                             </div>

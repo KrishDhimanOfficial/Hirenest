@@ -6,14 +6,14 @@
                 <div class="blog-sidebar-wrap widget-wrapper pb-20">
                     <div class="sidebar-widget-wrap">
                         <h4 class="widget-title">Add Job</h4>
-                        <form id="submitForm" class="checkout-form">
+                        <form id="updateForm" class="checkout-form" data-id="<%= job._id %>">
                             <div class="row">
                                 <div class="col-12 m-0">
                                     <div class="row">
                                         <div class="col-lg-12">
                                             <label>Job Title</label>
                                             <input type="text" placeholder="Name" name="jobTitle"
-                                                class="single-input-wrapper">
+                                                value="<%= job.jobTitle %>" class="single-input-wrapper">
                                         </div>
                                     </div> <!-- /.row -->
                                 </div>
@@ -22,16 +22,25 @@
                                     <select id="jobtindustries" class="single-input-wrapper select2" name="industryId"
                                         style="width: 100%;">
                                         <% jobtindustries.forEach(industry=> { %>
-                                            <option value="<%= industry._id  %>">
-                                                <%= industry.name %>
-                                            </option>
-                                            <% }) %>
+                                            <% if (industry._id.toString()===job.industryId) { %>
+                                                <option value="<%= industry._id  %>" selected>
+                                                    <%= industry.name %>
+                                                </option>
+                                                <% } else{ %>
+                                                    <option value="<%= industry._id  %>">
+                                                        <%= industry.name %>
+                                                    </option>
+                                                    <% } %>
+                                                        <% }) %>
                                     </select>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Category</label>
                                     <select id="categorySelect" class="single-input-wrapper select2" name="categoryId"
                                         style="width: 100%;">
+                                        <option value="<%= job.category?._id %>" selected>
+                                            <%= job.category?.name %>
+                                        </option>
                                     </select>
                                 </div>
                                 <div class="col-md-6 mb-3">
@@ -39,32 +48,57 @@
                                     <select class="single-input-wrapper select2" multiple name="jobTypeId"
                                         style="width: 100%;">
                                         <% jobtypes.forEach(jobtype=> { %>
-                                            <option value="<%= jobtype._id  %>">
-                                                <%= jobtype.name %>
-                                            </option>
-                                            <% }) %>
+                                            <% if (job.jobTypeId.some(id=> id.toString() === jobtype._id.toString())) { %>
+                                                <option value="<%= jobtype._id  %>" selected>
+                                                    <%= jobtype.name %>
+                                                </option>
+                                                <% } else { %>
+                                                    <option value="<%= jobtype._id  %>">
+                                                        <%= jobtype.name %>
+                                                    </option>
+                                                    <% } %>
+                                        <% }) %>
                                     </select>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Skills</label>
                                     <select id="jobskills" multiple class="single-input-wrapper select2" name="skills"
                                         style="width: 100%;">
+                                        <% job.skills?.forEach(skill=> { %>
+                                            <option value="<%= skill._id  %>" selected>
+                                                <%= skill.name %>
+                                            </option>
+                                            <% }) %>
                                     </select>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Tags</label>
                                     <select id="jobTags" multiple class="single-input-wrapper select2" name="tags"
                                         style="width: 100%;">
+                                        <% job.tags?.forEach(tag=> { %>
+                                            <option value="<%= tag._id  %>" selected>
+                                                <%= tag.name %>
+                                            </option>
+                                            <% }) %>
                                     </select>
                                 </div>
                                 <div class="col-lg-6 mb-3">
                                     <label>Salary</label>
                                     <div class="price__slider">
-                                        <div class="price_range">
-                                            <input type="text" id="amount" readonly="" name="salary"
-                                                style="border:0; color:#000; font-weight:bold;">
+                                        <div class="price_range m-0 flex-column">
+                                            <input type="text" hidden id="salarymin"  value="<%= job.salary.min %>">
+                                            <input type="text" hidden id="salarymax" value="<%= job.salary.max %>">
+                                            <div class="slider-container">
+                                                <div id="slider-range"></div>
+                                                <div class="slider-values">
+                                                    <span>Min: $<span id="min-value">0</span></span>
+                                                    <span>Max: $<span id="max-value">0</span></span>
+                                                </div>
+                                                <input type="text" id="amount" readonly name="salary" hidden>
+                                            </div>
                                             <div>
-                                                <input type="checkbox" name="hideSalary" id="hideSalary">
+                                                <input type="checkbox" name="hideSalary" <%=job.hideSalary ? 'checked'
+                                                    : '' %> id="hideSalary" >
                                                 <label for="hideSalary" class=" m-0">Hide Salary</label>
                                             </div>
                                         </div>
@@ -74,54 +108,75 @@
                                 <div class="col-lg-6 mb-3">
                                     <label>Salary Range</label>
                                     <select class="single-input-wrapper" name="salaryRange" style="width: 100%;">
-                                        <option value="Monthly">Monthly</option>
-                                        <option value="Yearly">Yearly</option>
-                                        <option value="Weekly">Weekly</option>
-                                        <option value="Daily">Daily</option>
-                                        <option value="Hourly">Hourly</option>
+                                        <option value="Monthly" <%=job.salaryRange=='Monthly' ? 'selected' : '' %>
+                                            >Monthly
+                                        </option>
+                                        <option value="Yearly" <%=job.salaryRange=='Yearly' ? 'selected' : '' %>>Yearly
+                                        </option>
+                                        <option value="Weekly" <%=job.salaryRange=='Weekly' ? 'selected' : '' %>>Weekly
+                                        </option>
+                                        <option value="Daily" <%=job.salaryRange=='Daily' ? 'selected' : '' %>>Daily
+                                        </option>
+                                        <option value="Hourly" <%=job.salaryRange=='Hourly' ? 'selected' : '' %>>Hourly
+                                        </option>
                                     </select>
                                 </div>
                                 <div class="col-lg-6 mb-3">
                                     <label>Job Experience</label>
                                     <select class="single-input-wrapper" name="experience" style="width: 100%;">
-                                        <option value="0-6">0-6 months</option>
-                                        <option value="0-1">0-1 year</option>
-                                        <option value="1-2">1-2 year</option>
-                                        <option value="2-3">2-3 year</option>
-                                        <option value="3-4">3-4 year</option>
-                                        <option value="4-5">4-5 year</option>
-                                        <option value="5">Above 5 year</option>
+                                        <% for( let i=1; i <=10; ++i ) { %>
+                                            <option value="<%= i %>">
+                                                <%= i %> year
+                                            </option>
+                                            <% } %>
+                                    </select>
+                                </div>
+                                 <div class="col-lg-6 mb-3">
+                                    <label>Job Openings</label>
+                                    <select class="single-input-wrapper" name="openings" style="width: 100%;">
+                                        <% for( let i=1; i <=15; ++i ) { %>
+                                            <option value="<%= i %>">
+                                                <%= i %> year
+                                            </option>
+                                            <% } %>
                                     </select>
                                 </div>
                                 <div class="col-lg-6 mb-3">
                                     <label>Job Degree</label>
                                     <select id="jobDegree" class="single-input-wrapper select2" name="degreeId"
                                         style="width: 100%;">
+                                        <option value="<%= job.degree?._id %>" selected>
+                                            <%= job.degree?.name %>
+                                        </option>
                                     </select>
                                 </div>
                                 <div class="col-lg-6">
                                     <label>Post Date</label>
-                                    <input type="date" name="postDate" class="single-input-wrapper">
+                                    <input type="date" name="postDate"
+                                        value="<%= new Date(job.postDate).toISOString().split('T')[0] %>"
+                                        class="single-input-wrapper">
                                 </div>
                                 <div class="col-lg-6">
                                     <label>Expire Date</label>
-                                    <input type="date" name="expireDate" class="single-input-wrapper">
+                                    <input type="date" name="expireDate"
+                                        value="<%= new Date(job.expireDate).toISOString().split('T')[0] %>"
+                                        class="single-input-wrapper">
                                 </div>
                                 <div class="col-12">
                                     <label>Short Description</label>
                                     <textarea placeholder="description" id="description" name="shortDesc"
-                                        spellcheck="false"></textarea>
+                                        spellcheck="false"><%- job.shortDesc %></textarea>
                                 </div>
                                 <div class="col-12 mb-3">
                                     <label>Content</label>
                                     <textarea placeholder="description" id="summernote" name="desc"
-                                        spellcheck="false"></textarea>
+                                        spellcheck="false"><%- job.desc %></textarea>
                                 </div>
                                 <div class="col-lg-4 mb-3">
                                     <label>Status</label>
                                     <select class="single-input-wrapper" name="status" style="width: 100%;">
-                                        <option value="true"> Active </option>
-                                        <option value="false"> Inactive </option>
+                                        <option value="true" <%=job.status ? 'selected' : '' %>> Active </option>
+                                        <option value="false" <%=job.status ? '' : 'selected' %>> Inactive </option>
                                     </select>
                                 </div>
                                 <div class="col-12 signup-form">
@@ -138,3 +193,31 @@
         </div>
     </div>
 </div>
+
+<style>
+.slider-container {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.slider-values {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+#slider-range {
+    height: 10px;
+    width: 100%;
+}
+
+#amount {
+    border: 0;
+    color: #666;
+    font-weight: bold;
+    text-align: center;
+    width: 100%;
+    margin-top: 10px;
+}
+</style>

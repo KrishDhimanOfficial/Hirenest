@@ -52,10 +52,10 @@ export const updatetableDataStatus = async (status, api) => {
     }
 }
 
-export const handleDeleteRequest = async (table_row, api) => {
+export const handleDeleteRequest = async (api) => {
     const res = await Fetch.delete(api)
     Notify(res)
-    if (res.success) table_row.remove(), window.location.reload()
+    if (res.success) window.location.reload()
 }
 
 export const previewImage = (e) => {

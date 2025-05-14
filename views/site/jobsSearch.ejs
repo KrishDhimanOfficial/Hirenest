@@ -1,0 +1,136 @@
+<main>
+    <!--products-section start-->
+    <section class="products__section pt-80 pb-130 pt-lg-60 pb-lg-40">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 offset-9">
+                    <% if (locals.error) { %>
+                        <div class="alert alert-error">
+                            <%= error %>
+                        </div>
+                        <% } %>
+                            <% if (locals.success){ %>
+                                <div class="alert alert-success">
+                                    <%= success %>
+                                </div>
+                                <% } %>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row gx-4 gx-xxl-5 align-items-center">
+                <div class="col-sm-6 text-center text-sm-start mb-40">
+                    <p class="show-product-count fw-medium">
+                        Showing <%= jobs.collectionData.length %>/<%= jobs.totalDocs %> result
+                    </p>
+                </div>
+                <div class="col-sm-6 text-center text-sm-end mb-40">
+                    <div class="sort-item">
+                        <div class="dropdown">
+                            <span>Sort by</span>
+                            <button class="sort-btn dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Default <i class="bi bi-chevron-down"></i>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                <li><a class="dropdown-item" href="/find/jobs?latest=true">Latest</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row gx-4 gx-xxl-5">
+                <div class="col-lg-9">
+                    <div class="row gx-4 px-0">
+                        <% jobs.collectionData?.forEach(job=> { %>
+                            <div class="col-lg-6 col-12">
+                                <% job.showAddListIcon=true %>
+                                    <%- include('./partials/jobCard',{job}) %>
+                            </div>
+                            <% }) %>
+                                <% if (jobs.totalPages && jobs.totalDocs> jobs.limit ) { %>
+                                    <div class="col-lg-12 mt-15">
+                                        <div class="page-pagination justify-content-lg-start justify-content-center">
+                                            <% if (jobs.page> 1) { %>
+                                                <a href="/find/jobs?page=<%= jobs.page - 1 %>">
+                                                    <i class="fa-solid fa-angles-left"></i>
+                                                </a>
+                                                <% } %>
+                                                    <% for(let i=1; i <=jobs.totalDocs; ++i ) { %>
+                                                        <a class="<%= jobs.page == i ?'active':'' %>"
+                                                            href="/find/jobs?page=<%= i %>">
+                                                            <%= i %>
+                                                        </a>
+                                                        <% } %>
+                                                            <% if (jobs.page < jobs. totalPages) { %>
+                                                                <a href="/find/jobs?page=<%= jobs.page + 1 %>">
+                                                                    <i class="fa-solid fa-angles-right"></i>
+                                                                </a>
+                                                                <% } %>
+                                        </div>
+                                    </div>
+                                    <% } %>
+                    </div>
+                </div>
+                <div class="col-lg-3 order-lg-first">
+                    <div class="shop-sidebar">
+                        <div class="sidebar-widget mb-40">
+                            <div class="widget-title mb-15">
+                                <h4>Categories</h4>
+                            </div>
+                            <div class="sidebar_widget-content">
+                                <div class="categories-accordion">
+                                    <div class="accordion" id="accordionShop">
+                                        <div class="accordion-item mb-10">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#collapseOne" aria-expanded="true"
+                                                aria-controls="collapseOne">
+                                                Smart Glass
+                                            </button>
+                                            <ul id="collapseOne" class="accordion-collapse collapse show"
+                                                data-bs-parent="#accordionShop">
+                                                <li><a href="#">Ai Glass</a></li>
+                                                <li><a href="#">Digital Glass</a></li>
+                                                <li><a href="#">5D Gadget</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sidebar-widget mb-40">
+                            <div class="widget-title mb-15">
+                                <h4>hightlight</h4>
+                            </div>
+                            <div class="sidebar_widget-content">
+                                <ul class="highlight_content">
+                                    <li><a href="#">Promotions (885)</a></li>
+                                    <li><a href="#">New Arrivals (987)</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="sidebar-widget mb-40">
+                            <div class="widget-title mb-15">
+                                <h4>By Prices</h4>
+                            </div>
+                            <div class="sidebar_widget-content">
+                                <div class="price__slider">
+                                    <form class="price_range" action="#">
+                                        <button class="filter">filter</button>
+                                        <label for="amount">Price:</label>
+                                        <input type="text" id="amount" readonly
+                                            style="border:0; color:#f6931f; font-weight:bold;">
+                                    </form>
+
+                                    <div id="slider-range"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+    <!--products-section end-->
+</main>

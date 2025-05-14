@@ -13,6 +13,7 @@ import jobDegreeModel from '../models/job.degree.model.js'
 import jobIndustryTypeModel from '../models/job.industry.type.model.js'
 import mongoose from 'mongoose'
 import jobModel from '../models/job.model.js'
+const ObjectId = mongoose.Types.ObjectId;
 
 const siteControllers = {
     renderTermsPage: async (req, res) => {
@@ -331,6 +332,68 @@ const siteControllers = {
             console.log('renderUserExperience : ' + error.message)
         }
     },
+    renderSavedJobList: async (req, res) => {
+        try {
+            const pipeline = [
+                {
+                    $lookup: {
+                        from: 'job_categories',
+                        localField: 'categoryId',
+                        foreignField: '_id',
+                        as: 'category'
+                    }
+                },
+                {
+                    $unwind: '$category'
+                },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: 'recuriterId',
+                        foreignField: '_id',
+                        as: 'user'
+                    }
+                },
+                {
+                    $unwind: '$user'
+                },
+                {
+                    $addFields: {
+                        state: '$user.location.state',
+                        country: '$user.location.country',
+                        companylogo: '$user.image'
+                    }
+                },
+                {
+                    $project: {
+                        jobTitle: 1,
+                        'category.name': 1,
+                        state: 1,
+                        country: 1,
+                        experience: 1,
+                        hideSalary: 1,
+                        salary: 1,
+                        companylogo: 1,
+                        shortDesc: 1
+                    }
+                }
+            ]
+            const jobs = await handleAggregatePagination(jobModel, pipeline, req.query)
+            return res.render('layout/site',
+                {
+                    body: '../site/candidate/dashboard',
+                    profilelayout: './savedJobs',
+                    title: 'HireNest | Profile',
+                    subtitle: `Profile - ${req.user?.name}`,
+                    user: req.user,
+                    jobs,
+                    getState: State.getStateByCodeAndCountry
+                }
+            )
+        } catch (error) {
+            console.log('renderSavedJobList : ' + error.message)
+        }
+    },
     renderRecuriterProfilePage: async (req, res) => {
         try {
             const country = req.user?.location.country;
@@ -374,7 +437,6 @@ const siteControllers = {
                     profilelayout: './dashboardoptions',
                     title: `Profile - ${req.user?.companyName}`,
                     user: req.user,
-                    // endApi: 'api/recruiter',
                 })
         } catch (error) {
             console.log('renderRecuriterDashBoard : ' + error.message)
@@ -428,7 +490,8 @@ const siteControllers = {
                     profilelayout: './jobs',
                     title: `Profile - ${req.user?.companyName}`,
                     user: req.user,
-                    jobs
+                    jobs,
+                    endApi: 'api/recruiter/create-job',
                 })
         } catch (error) {
             console.log('renderJobsPage : ' + error.message)
@@ -467,10 +530,11 @@ const siteControllers = {
             const country = req.user?.location.country;
             const state = req.user?.location.state;
             const city = req.user?.location.city;
+
             const pipeline = [
                 {
                     $match: {
-                        _id: new mongoose.Types.ObjectId(req.params.id),
+                        _id: new ObjectId(req.params.id),
                         recuriterId: req.user?._id
                     }
                 },
@@ -484,17 +548,6 @@ const siteControllers = {
                 },
                 {
                     $unwind: '$category'
-                },
-                {
-                    $lookup: {
-                        from: 'jobindustrytypes',
-                        localField: 'industryId',
-                        foreignField: '_id',
-                        as: 'industry'
-                    }
-                },
-                {
-                    $unwind: '$jobindustry'
                 },
                 {
                     $lookup: {
@@ -538,17 +591,16 @@ const siteControllers = {
                 jobIndustryTypeModel.find({ status: true }),
                 jobModel.aggregate(pipeline)
             ])
-            console.log(job);
 
             return res.render('layout/site',
                 {
                     body: '../site/recuriter/dashboard',
-                    profilelayout: './createJob',
+                    profilelayout: './updateJob',
                     title: `Profile - ${req.user?.companyName}`,
                     user: req.user,
                     jobtypes,
                     jobtindustries,
-                    job,
+                    job: job[0],
                     endApi: 'api/recruiter/create-job',
                     country: Country.getCountryByCode(country),
                     state: State.getStateByCodeAndCountry(state, country),
@@ -556,6 +608,73 @@ const siteControllers = {
                 })
         } catch (error) {
             console.log('renderUpdateJobPage : ' + error.message)
+        }
+    },
+    renderSearchJobPage: async (req, res) => {
+        try {
+            const { latest } = req.query
+            const pipeline = [
+                {
+                    $lookup: {
+                        from: 'job_categories',
+                        localField: 'categoryId',
+                        foreignField: '_id',
+                        as: 'category'
+                    }
+                },
+                {
+                    $unwind: '$category'
+                },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: 'recuriterId',
+                        foreignField: '_id',
+                        as: 'user'
+                    }
+                },
+                {
+                    $unwind: '$user'
+                },
+                {
+                    $addFields: {
+                        state: '$user.location.state',
+                        country: '$user.location.country',
+                        companylogo: '$user.image'
+                    }
+                },
+                {
+                    $project: {
+                        jobTitle: 1,
+                        'category.name': 1,
+                        state: 1,
+                        country: 1,
+                        experience: 1,
+                        hideSalary: 1,
+                        salary: 1,
+                        companylogo: 1,
+                        shortDesc: 1
+                    }
+                }
+            ]
+            if (latest) pipeline.push({ $sort: { postDate: 1 } })
+
+            const jobs = await handleAggregatePagination(jobModel, pipeline, req.query)
+            const error = req.session.error;
+            const success = req.session.success;
+
+            delete req.session.error
+            delete req.session.success
+            return res.render('layout/site',
+                {
+                    body: '../site/jobsSearch',
+                    title: 'Home - Search Jobs',
+                    user: req.user, jobs, error, success,
+                    getState: State.getStateByCodeAndCountry
+                }
+            )
+        } catch (error) {
+            console.log('renderSearchJobPage : ' + error.message)
         }
     },
 }

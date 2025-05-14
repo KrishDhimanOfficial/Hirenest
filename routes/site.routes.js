@@ -76,6 +76,10 @@ router.get('/api/job-tags', siteControllers.getTags) // Job Tags
 router.get('/api/job-categories', siteControllers.getcategories) // Job Categories
 router.get('/api/job-degrees', siteControllers.getdegrees) // Job Categories
 
+router.get('/find/jobs', siteControllers.renderSearchJobPage)
+router.get('/job/saved/:id', jobControllers.updateSavedJobs)
+router.get('/job/details/:job',jobControllers.renderSearchDetails)
+
 // Project
 router.route('/api/user/project/:id?')
     .post(upload.none(), usersControllers.createUserProject)
@@ -104,6 +108,7 @@ router.route('/api/recruiter')
 
 router.route('/api/recruiter/create-job/:id?')
     .post(upload.none(), jobControllers.createJob)
+    .put(upload.none(), jobControllers.updateJob)
     .delete(jobControllers.deleteJob)
 
 router.use('/profile', checkIsCandidate, userProfileRoutes)

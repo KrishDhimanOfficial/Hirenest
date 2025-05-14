@@ -1,0 +1,63 @@
+<figure class="product__wrapper white-bg mb-45">
+    <div class="product-thumb">
+        <% if (job.showAddListIcon) { %>
+            <div class="action-btn">
+                <a href="/job/saved/<%= job._id %>"><i class="fa-regular fa-heart"></i></a>
+            </div>
+            <% } %>
+        </div>   
+    <figcaption class="figure-caption">
+        <div class="d-flex justify-content-between w-100">
+            <div>
+                <div class="product-tag">
+                    <%= job.category?.name %>
+                </div>
+                <h4 class="mb-2">
+                    <a class="product__title " href="/job/details<%= job.jobTitle %>">
+                        <%= job.jobTitle %>
+                    </a>
+                </h4>
+            </div>
+            <img src="/uploads/logo/<%= job.companylogo %>" class="figure-img m-0" alt="product_img"
+                style="width: 80px; height: 80px; border-radius: 50%;">
+        </div>
+        <ul class="d-flex gap-2 p-0" style="list-style: none;">
+            <li>
+                <i class="fa-solid fa-briefcase me-2"></i>
+                <span>0 - <%= job.experience %> year</span>
+            </li>
+            <li>
+                |
+            </li>
+            <li>
+                <span>
+                    &#8377
+                    <% if (job.hideSalary) { %>
+                        Not Disclosed
+                        <% } else { %>
+                            <%= job.salary.min %>
+                                -
+                                <%= job.salary.max %>
+                                    <% } %>
+                </span>
+            </li>
+            <li>
+                |
+            </li>
+            <li>
+                <i class="fa-solid fa-location-dot me-2"></i>
+                <span>
+                    <%= getState(job.state,job.country).name %>
+                </span>
+            </li>
+        </ul>
+        <div class="price">
+            <p class="old-price" style="line-height: 20px;">
+                <%= job.shortDesc.slice(0,200) + '...' %>
+            </p>
+        </div>
+        <a class="cart-btn" href="/job/details/<%= encodeURIComponent(job.jobTitle) %>"><i class="bi bi-cart2"></i>
+            view Now
+        </a>
+    </figcaption>
+</figure>

@@ -18,6 +18,30 @@ if (document.querySelector("#datatable")) $("#datatable").DataTable({
     "responsive": true,
 })
 
+$(function () {
+    $("#slider-range").slider({
+        range: true,
+        min: 0,
+        max: 100000,
+        values: [
+            document.querySelector('#salarymin').value,
+            document.querySelector('#salarymax').value
+        ],
+        slide: function (event, ui) {
+            $("#amount").val(ui.values[0] + " - " + ui.values[1]);
+            // Update the displayed values
+            $("#min-value").text(ui.values[0]);
+            $("#max-value").text(ui.values[1]);
+        }
+    });
+
+    // Set initial values
+    $("#amount").val($("#slider-range").slider("values", 0) +
+        " - " + $("#slider-range").slider("values", 1));
+    $("#min-value").text($("#slider-range").slider("values", 0));
+    $("#max-value").text($("#slider-range").slider("values", 1));
+})
+
 if ($('#summernote')) $('#summernote').summernote({
     height: 300, // Set editor height
     tooltip: false,
@@ -320,49 +344,3 @@ $('#jobDegree').on('select2:open', function () {
 
 MultiSelectInit('#jobskills', '/api/job-skills?skill')
 MultiSelectInit('#jobTags', '/api/job-tags?tag')
-// $('#jobTags').on('select2:open', function () {
-//     let timeout;
-//     let controller;
-
-//     try {
-//         const $searchField = $('.select2-container--open .select2-search__field')
-
-//         $searchField.off('input keyup')
-//         $searchField.on('input keyup', async function () {
-//             const searchTerm = $(this).val().trim()
-
-//             if (timeout) clearTimeout(timeout)
-//             if (controller) controller.abort()
-
-//             timeout = setTimeout(async () => {
-//                 controller = new AbortController()
-
-//                 try {
-//                     const responseArray = await Fetch.get(`/api/job-tags?tag=${encodeURIComponent(searchTerm)}`, {}, controller.signal);
-//                     const selectedValue = $('#jobTags').val() || [];
-
-//                     // Remove previous unselected options
-//                     $('#jobTags').find('option:not(:selected)').remove()
-
-//                     responseArray.forEach(item => {
-//                         if (!selectedValue.includes(item._id)) {
-//                             const newOption = new Option(item.name, item._id, false, false)
-//                             $('#jobTags').append(newOption);
-//                         }
-//                     })
-
-//                     $('#jobTags').trigger('change.select2')
-
-//                     // Restore search field focus
-//                     setTimeout(() => {
-//                         $searchField.focus().trigger('input')
-//                     }, 0)
-//                 } catch (error) {
-//                     console.error('Error fetching responseArray:', error)
-//                 }
-//             }, 300)
-//         })
-//     } catch (error) {
-//         console.error('Error in select2 open handler:', error)
-//     }
-// })

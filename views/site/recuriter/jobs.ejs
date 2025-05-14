@@ -1,10 +1,9 @@
 <div class="checkout-section <%= padding ? 'pt-150 pt-lg-120 pb-130 pb-lg-70' : 'px-4 py-0' %>">
     <div class="container">
+        <input type="hidden" id="endapi" value="<%= endApi %>">
         <div class="row mb-3">
             <div class="col-md-3 ms-auto signup-form">
                 <div class="submit-btn">
-                    <!-- <button id="addJobs" type="submit" class="signup-btn btn-1" data-bs-toggle="modal"
-                        data-bs-target="#openJobsmodal">Add</button> -->
                     <a href="/recruiter/add/job" class="signup-btn btn-1 text-center">Add</a>
                 </div>
             </div>
@@ -26,14 +25,16 @@
                                                     Exprie on <%= job.expireDate %>
                                                 </li>
                                                 <li>
-                                                    <span class="badge rounded-pill <%= job.status ? 'text-bg-success' :'text-bg-danger' %>">
+                                                    <span
+                                                        class="badge rounded-pill <%= job.status ? 'text-bg-success' :'text-bg-danger' %>">
                                                         <%= job.status ? 'Active' :'InActive' %>
                                                     </span>
                                                 </li>
                                             </ul>
                                         </div>
                                         <div class="d-flex align-items-center gap-2">
-                                            <a href="/recruiter/update/job/<%= job._id %>" class="btn btn-dark bg-transparent projectedit">
+                                            <a href="/recruiter/update/job/<%= job._id %>"
+                                                class="btn btn-dark bg-transparent projectedit">
                                                 <i class="fa-solid fa-edit text-dark"></i>
                                             </a>
 
