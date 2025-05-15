@@ -21,7 +21,7 @@
             <div class="row gx-4 gx-xxl-5 align-items-center">
                 <div class="col-sm-6 text-center text-sm-start mb-40">
                     <p class="show-product-count fw-medium">
-                        Showing <%= jobs.collectionData.length %>/<%= jobs.totalDocs %> result
+                        Showing <%= jobs.collectionData?.length %>/<%= jobs.totalDocs %> result
                     </p>
                 </div>
                 <div class="col-sm-6 text-center text-sm-end mb-40">
@@ -33,7 +33,9 @@
                                 Default <i class="bi bi-chevron-down"></i>
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                <li><a class="dropdown-item" href="/find/jobs?latest=true">Latest</a></li>
+                                <li><a class="dropdown-item"
+                                        href="/find/jobs?<%= new URLSearchParams({ ...query, latest:true }).toString() %>">Latest</a>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -74,58 +76,67 @@
                 </div>
                 <div class="col-lg-3 order-lg-first">
                     <div class="shop-sidebar">
-                        <div class="sidebar-widget mb-40">
-                            <div class="widget-title mb-15">
-                                <h4>Categories</h4>
-                            </div>
-                            <div class="sidebar_widget-content">
-                                <div class="categories-accordion">
-                                    <div class="accordion" id="accordionShop">
-                                        <div class="accordion-item mb-10">
-                                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                                data-bs-target="#collapseOne" aria-expanded="true"
-                                                aria-controls="collapseOne">
-                                                Smart Glass
-                                            </button>
-                                            <ul id="collapseOne" class="accordion-collapse collapse show"
-                                                data-bs-parent="#accordionShop">
-                                                <li><a href="#">Ai Glass</a></li>
-                                                <li><a href="#">Digital Glass</a></li>
-                                                <li><a href="#">5D Gadget</a></li>
-                                            </ul>
+                        <%- console.log('sfger' ,query) %>
+                            <form class="checkout-form"
+                                action="/find/jobs?<%= new URLSearchParams({ query }).toString() %>" method="get">
+                                <input type="text" hidden name="search" value="<%= query.search %>">
+                                <input type="text" hidden name="latest" value="<%= query.latest %>">
+                                <div class="col-12 signup-form">
+                                    <div class="submit-btn">
+                                        <Button id="submitFormBtn" type="submit"
+                                            class="signup-btn btn-1">Submit</Button>
+                                    </div>
+                                </div>
+                                <div class="sidebar-widget mb-40">
+                                    <div class="widget-title mb-15">
+                                        <h4>Categories</h4>
+                                    </div>
+                                    <div class="sidebar_widget-content">
+                                        <div class="categories-accordion">
+                                            <div class="accordion" id="accordionShop">
+                                                <div class="accordion-item mb-10">
+                                                    <button class="accordion-button" type="button"
+                                                        data-bs-toggle="collapse" data-bs-target="#collapseOne"
+                                                        aria-expanded="true" aria-controls="collapseOne">
+                                                        Smart Glass
+                                                    </button>
+                                                    <ul id="collapseOne" class="accordion-collapse collapse show"
+                                                        data-bs-parent="#accordionShop">
+                                                        <li><a href="#">Ai Glass</a></li>
+                                                        <li><a href="#">Digital Glass</a></li>
+                                                        <li><a href="#">5D Gadget</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="sidebar-widget mb-40">
-                            <div class="widget-title mb-15">
-                                <h4>hightlight</h4>
-                            </div>
-                            <div class="sidebar_widget-content">
-                                <ul class="highlight_content">
-                                    <li><a href="#">Promotions (885)</a></li>
-                                    <li><a href="#">New Arrivals (987)</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="sidebar-widget mb-40">
-                            <div class="widget-title mb-15">
-                                <h4>By Prices</h4>
-                            </div>
-                            <div class="sidebar_widget-content">
-                                <div class="price__slider">
-                                    <form class="price_range" action="#">
-                                        <button class="filter">filter</button>
-                                        <label for="amount">Price:</label>
-                                        <input type="text" id="amount" readonly
-                                            style="border:0; color:#f6931f; font-weight:bold;">
-                                    </form>
-
-                                    <div id="slider-range"></div>
+                                <div class="sidebar-widget mb-40">
+                                    <div class="widget-title mb-15">
+                                        <h4>hightlight</h4>
+                                    </div>
+                                    <div class="sidebar_widget-content">
+                                        <ul class="highlight_content">
+                                            <li><a href="#">Promotions (885)</a></li>
+                                            <li><a href="#">New Arrivals (987)</a></li>
+                                        </ul>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
+                                <div class="sidebar-widget mb-40">
+                                    <div class="widget-title mb-15">
+                                        <h4>Experience</h4>
+                                    </div>
+                                    <div class="sidebar_widget-content">
+                                        <Select name="experience" class="single-input-wrapper">
+                                             <% for( let i=1; i <=15; ++i ) { %>
+                                            <option value="<%= i %>">
+                                                <%= i %> year
+                                            </option>
+                                            <% } %>
+                                        </Select>
+                                    </div>
+                                </div>
+                            </form>
                     </div>
                 </div>
             </div>

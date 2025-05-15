@@ -76,6 +76,7 @@ router.get('/api/job-tags', siteControllers.getTags) // Job Tags
 router.get('/api/job-categories', siteControllers.getcategories) // Job Categories
 router.get('/api/job-degrees', siteControllers.getdegrees) // Job Categories
 
+router.get('/apply/job/:id', jobControllers.applyJob)
 router.get('/find/jobs', siteControllers.renderSearchJobPage)
 router.get('/job/saved/:id', jobControllers.updateSavedJobs)
 router.get('/job/details/:job',jobControllers.renderSearchDetails)

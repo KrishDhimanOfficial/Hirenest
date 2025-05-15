@@ -53,7 +53,7 @@ const jobAttributesController = {
                 },
                 { $unwind: '$industry' }
             ])
-            
+
             if (!response) return res.status(404).json({ error: 'Not Found.' })
             return res.status(200).json(response[0])
         } catch (error) {
@@ -441,7 +441,13 @@ const jobAttributesController = {
             const checkExstence = await skillModel.findOne({ name })
             if (checkExstence) return res.status(400).json({ error: `${name} Exists.` })
 
-            const response = await skillModel.create({ name })
+            const response = await skillModel.create({
+                name, slug: slugify(name, {
+                    replacement: '-',
+                    lower: true,
+                    trim: true,
+                })
+            })
             if (!response) return res.status(400).json({ error: 'Something went wrong, please try again later.' })
             return res.status(200).json({ success: 'updated successfully.' })
         } catch (error) {
@@ -467,7 +473,13 @@ const jobAttributesController = {
 
             const response = await skillModel.findByIdAndUpdate(
                 { _id: req.params.id },
-                { name },
+                {
+                    name, slug: slugify(name, {
+                        replacement: '-',
+                        lower: true,
+                        trim: true,
+                    })
+                },
                 { new: true, runValidators: true }
             )
             if (!response) return res.status(400).json({ error: 'Something went wrong, please try again later.' })

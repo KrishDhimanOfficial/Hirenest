@@ -3,6 +3,7 @@ import validate from "../services/validate.js";
 import jobModel from "../models/job.model.js";
 import { parseISO } from "date-fns";
 import userModel from "../models/user.model.js";
+import { State } from "country-state-city";
 const validateId = mongoose.Types.ObjectId.isValid;
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -122,15 +123,198 @@ const jobControllers = {
     },
     renderSearchDetails: async (req, res) => {
         try {
+            const keywords = req.params.job.split(" ");
+
+            const relevantJobspipeline = [
+                {
+                    $match: {
+                        $and: [
+                            {
+                                $or: keywords.map(word => ({
+                                    jobTitle: { $regex: word, $options: 'i' }
+                                }))
+                            },
+                            {
+                                jobTitle: { $ne: req.params.job }
+                            },
+                        ]
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'job_categories',
+                        localField: 'categoryId',
+                        foreignField: '_id',
+                        as: 'category'
+                    }
+                },
+                {
+                    $unwind: {
+                        path: '$category',
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $project: {
+                        jobTitle: 1,
+                        'category.name': 1,
+                        state: 1,
+                        country: 1,
+                        experience: 1,
+                        hideSalary: 1,
+                        salary: 1,
+                        companylogo: 1,
+                        shortDesc: 1,
+                        companyName: 1
+                    }
+                }
+            ]
+            const jobpipeline = [
+                {
+                    $match: { jobTitle: req.params.job }
+                },
+                {
+                    $lookup: {
+                        from: 'job_categories',
+                        localField: 'categoryId',
+                        foreignField: '_id',
+                        as: 'category'
+                    }
+                },
+                {
+                    $unwind: {
+                        path: '$category',
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'degrees',
+                        localField: 'degreeId',
+                        foreignField: '_id',
+                        as: 'degree'
+                    }
+                },
+                {
+                    $unwind: {
+                        path: '$degree',
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'jobtypes',
+                        localField: 'jobTypeId',
+                        foreignField: '_id',
+                        as: 'empolymenttype'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'jobindustrytypes',
+                        localField: 'industryId',
+                        foreignField: '_id',
+                        as: 'industry'
+                    }
+                },
+                {
+                    $unwind: {
+                        path: '$industry',
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: 'recuriterId',
+                        foreignField: '_id',
+                        as: 'user'
+                    }
+                },
+                { $unwind: '$user' },
+                {
+                    $lookup: {
+                        from: 'jobskills',
+                        localField: 'skills',
+                        foreignField: '_id',
+                        as: 'skills'
+                    }
+                },
+                {
+                    $addFields: {
+                        appliedCount: { $size: '$appliedusersId' },
+                        state: '$user.location.state',
+                        country: '$user.location.country',
+                        companylogo: '$user.image',
+                        companyName: '$user.companyName',
+                        daysSincePosted: {
+                            $dateDiff: {
+                                startDate: '$postDate',
+                                endDate: '$$NOW',
+                                unit: 'day'
+                            }
+                        }
+                    }
+                },
+                {
+                    $project: {
+                        appliedCount: 1, jobTitle: 1, daysSincePosted: 1, 'category.name': 1, state: 1,
+                        country: 1, experience: 1, hideSalary: 1, salary: 1, companylogo: 1, salaryRange: 1,
+                        shortDesc: 1, companyName: 1, openings: 1, desc: 1,
+                        skills: 1, 'industry.name': 1, empolymenttype: 1, 'degree.name': 1
+                    }
+                }
+            ]
+
+            const [job, relevantJobs] = await Promise.all([
+                jobModel.aggregate(jobpipeline),
+                jobModel.aggregate(relevantJobspipeline).limit(7).sort({ postDate: 1 })
+            ])
+            if (!job) return res.status(404).redirect('/find/jobs')
+
+            const error = req.session.error;
+            const success = req.session.success;
+
+            delete req.session.error
+            delete req.session.success
+
             return res.render('layout/site',
                 {
                     body: '../site/jobDetails',
                     title: `Job Details - ${req.params.job}`,
                     user: req.user,
+                    job: job[0], error, success, relevantJobs,
+                    getState: State.getStateByCodeAndCountry
                 }
             )
         } catch (error) {
             console.log('renderSearchDetails : ' + error.message)
+        }
+    },
+    applyJob: async (req, res) => {
+        try {
+            if (!req.user) return res.status(400).redirect('/login')
+            const job = await jobModel.findById({ _id: req.params.id }, { jobTitle: 1 })
+
+            if (!validateId(req.params.id)) {
+                req.session.error = 'Something went wrong! Please try again later.'
+                return res.status(400).redirect(`/job/details/${job.jobTitle}`)
+            }
+
+            const response = await userModel.findByIdAndUpdate({ _id: req.user?._id },
+                { $addToSet: { appliedJobs: [new ObjectId(req.params.id)] } }
+            )
+
+            if (!response) {
+                req.session.error = 'Something went wrong! Please try again later.'
+                return res.status(400).redirect(`/job/details/${job.jobTitle}`)
+            }
+
+            await jobModel.findByIdAndUpdate({ _id: req.params.id }, { $addToSet: { appliedusersId: [req.user?._id] } })
+            req.session.success = 'Added to Applied List.'
+            return res.status(200).redirect(`/job/details/${job.jobTitle}`)
+        } catch (error) {
+            console.log('applyJob : ' + error.message)
         }
     },
 }

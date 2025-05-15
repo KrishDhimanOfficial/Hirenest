@@ -1,4 +1,178 @@
 <main>
     <section class="products__section pt-80 pb-130 pt-lg-60 pb-lg-40">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 offset-9">
+                    <% if (locals.error) { %>
+                        <div class="alert alert-error">
+                            <%= error %>
+                        </div>
+                        <% } %>
+                            <% if (locals.success){ %>
+                                <div class="alert alert-success">
+                                    <%= success %>
+                                </div>
+                                <% } %>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="col-md-8">
+                <figure class="product__wrapper white-bg mb-45">
+                    <div class="product-thumb">
+                        <% if (job.showAddListIcon) { %>
+                            <div class="action-btn">
+                                <a href="/job/saved/<%= job._id %>"><i class="fa-regular fa-heart"></i></a>
+                            </div>
+                            <% } %>
+                    </div>
+                    <figcaption class="figure-caption">
+                        <div class="d-flex justify-content-between w-100">
+                            <div>
+                                <div class="product-tag">
+                                    <%= job.category?.name %>
+                                </div>
+                                <h4 class="mb-2">
+                                    <a class="product__title " href="/job/details<%= job.jobTitle %>">
+                                        <%= job.jobTitle %>
+                                    </a>
+                                </h4>
+                            </div>
+                            <img src="/uploads/logo/<%= job.companylogo %>" class="figure-img m-0"
+                                title="<%=  job.companyName %>" alt="<%=  job.companyName %>"
+                                style="width: 80px; height: 80px; border-radius: 50%;">
+                        </div>
+                        <ul class="d-flex gap-2 p-0" style="list-style: none;">
+                            <li>
+                                <i class="fa-solid fa-briefcase me-2"></i>
+                                <span>0 - <%= job.experience %> year</span>
+                            </li>
+                            <li>
+                                |
+                            </li>
+                            <li>
+                                <span>
+                                    &#8377
+                                    <% if (job.hideSalary) { %>
+                                        Not Disclosed
+                                        <% } else { %>
+                                            <%= job.salary.min %>
+                                                -
+                                                <%= job.salary.max %>
+                                                    <% } %>
+                                                        <%= job.salaryRange %>
+                                </span>
+                            </li>
+                            <li>
+                                |
+                            </li>
+                            <li>
+                                <i class="fa-solid fa-location-dot me-2"></i>
+                                <span>
+                                    <%= getState(job.state,job.country).name %>
+                                </span>
+                            </li>
+                        </ul>
+                        <div class="price">
+                            <p class="old-price" style="line-height: 20px;">
+                                <%= job.shortDesc %>
+                            </p>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-center">
+                            <ul class="d-flex gap-4 p-0" style="list-style: none;">
+                                <li>
+                                    Posted Date : <%= job.daysSincePosted %> days ago
+                                </li>
+                                <li>
+                                    Openings : <%= job.openings %>
+                                </li>
+                                <li>
+                                    Applicants : <%= job.appliedCount %>
+                                </li>
+                            </ul>
+                            <ul class="d-flex gap-4 p-0 ms-auto" style="list-style: none;">
+                                <% if (!user.isrecuiter) { %>
+                                    <li>
+                                        <a class="cart-btn py-2 px-3" href="/apply/job/<%= job._id %>">
+                                            apply job
+                                        </a>
+                                    </li>
+                                     <li>
+                                        <a class="cart-btn py-2 px-3" href="/job/saved/<%= job._id %>">
+                                            save job
+                                        </a>
+                                    </li>
+                                    <% } %>
+                            </ul>
+                        </div>
+                    </figcaption>
+                </figure>
+                <div class="product__description">
+                    <h4 class="mb-3">Job Description</h4>
+                    <p>
+                        <%- job.desc %>
+                    </p>
+                </div>
+                <div class="meta-info-wrap">
+                    <div class="meta-info meta-info d-flex gap-2 mb-2">
+                        <div class="meta-info-title">Role : </div>
+                        <div class="meta-info-desc">
+                            <%= job.jobTitle %>
+                        </div>
+                    </div>
+                    <div class="meta-info  meta-info d-flex gap-2 mb-2">
+                        <div class="meta-info-title">Industry Type : </div>
+                        <div class="meta-info-desc">
+                            <a href="#">
+                                <i class="fa-sharp fa-solid fa-location-plus"></i>
+                                <%= job.industry?.name %>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="meta-info  meta-info d-flex gap-2 mb-2">
+                        <div class="meta-info-title">Empolyment Type : </div>
+                        <div class="meta-info-desc">
+                            <% job.empolymenttype?.forEach(jobtype=> { %>
+                                <span class="p-1">
+                                    <%= jobtype.name %>,
+                                </span>
+                                <% }) %>
+                        </div>
+                    </div>
+                    <div class="meta-info  meta-info d-flex gap-2 mb-2">
+                        <div class="meta-info-title">Education : </div>
+                        <div class="meta-info-desc">
+                            <span class="p-1">
+                                <%= job.degree.name %>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="meta-info  meta-info d-flex gap-2 mb-2">
+                        <div class="meta-info-title">Role Category : </div>
+                        <div class="meta-info-desc">
+                            <%= job.category?.name %>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-widget-wrap pt-30">
+                    <h4 class="widget-title">Key Skills</h4>
+                    <div class="page-pagination justify-content-start flex-wrap">
+                        <% job.skills?.forEach(skill=> { %>
+                            <a href="/find-jobs/skill/<%= skill.slug %>" class="p-1" style="width: 90px;">
+                                <%= skill.name %>
+                            </a>
+                            <% }) %>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                  <% relevantJobs?.forEach(job=> { %>
+                            <div class="col-lg-6 col-12">
+                                <% job.showAddListIcon=true %>
+                                    <%- include('./partials/jobCard.ejs',{job}) %>
+                            </div>
+                            <% }) %>
+            </div>
     </section>
 </main>

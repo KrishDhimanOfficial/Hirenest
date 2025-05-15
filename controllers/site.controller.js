@@ -612,8 +612,23 @@ const siteControllers = {
     },
     renderSearchJobPage: async (req, res) => {
         try {
-            const { latest } = req.query
+            const { latest, search, experience } = req.query;
+            // console.log('renderSearchJobPage - queryparams :', req.query);
+
+            const educationsPipeline = [
+                { $lookup: { from: 'jobs', localField: '_id', foreignField: 'degreeId', as: 'degree' } },
+                { $project: { 'degree._id': 1, name: 1 } },
+                { $addFields: { count: { $size: '$degree' } } },
+                { $project: { name: 1, count: 1 } }
+            ]
+
             const pipeline = [
+                {
+                    $match: {
+                        jobTitle: { $regex: search || '', $options: 'i' },
+                        status: true
+                    }
+                },
                 {
                     $lookup: {
                         from: 'job_categories',
@@ -633,14 +648,19 @@ const siteControllers = {
                         as: 'user'
                     }
                 },
+                { $unwind: '$user' },
                 {
-                    $unwind: '$user'
+                    $match: {
+                        'user.isactive': true,
+                        'user.isrecuiter': true
+                    }
                 },
                 {
                     $addFields: {
                         state: '$user.location.state',
                         country: '$user.location.country',
-                        companylogo: '$user.image'
+                        companylogo: '$user.image',
+                        companyName: '$user.companyName'
                     }
                 },
                 {
@@ -653,13 +673,19 @@ const siteControllers = {
                         hideSalary: 1,
                         salary: 1,
                         companylogo: 1,
-                        shortDesc: 1
+                        shortDesc: 1,
+                        companyName: 1
                     }
                 }
             ]
             if (latest) pipeline.push({ $sort: { postDate: 1 } })
+            if (experience) pipeline.push({ $match: { experience: { $lte: parseInt(experience) } } })
 
-            const jobs = await handleAggregatePagination(jobModel, pipeline, req.query)
+            const [jobs, educations] = await Promise.all([
+                handleAggregatePagination(jobModel, pipeline, req.query),
+                jobDegreeModel.aggregate(educationsPipeline)
+            ])
+
             const error = req.session.error;
             const success = req.session.success;
 
@@ -670,6 +696,7 @@ const siteControllers = {
                     body: '../site/jobsSearch',
                     title: 'Home - Search Jobs',
                     user: req.user, jobs, error, success,
+                    query: req.query,
                     getState: State.getStateByCodeAndCountry
                 }
             )

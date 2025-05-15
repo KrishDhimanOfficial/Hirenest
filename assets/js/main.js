@@ -24,14 +24,14 @@ $(function () {
         min: 0,
         max: 100000,
         values: [
-            document.querySelector('#salarymin').value,
-            document.querySelector('#salarymax').value
+            document.querySelector('#salarymin')?.value ?? 0,
+            document.querySelector('#salarymax')?.value ?? 100000
         ],
         slide: function (event, ui) {
-            $("#amount").val(ui.values[0] + " - " + ui.values[1]);
+            $("#amount").val('₹' + ui.values[0] + " - " + ui.values[1]);
             // Update the displayed values
-            $("#min-value").text(ui.values[0]);
-            $("#max-value").text(ui.values[1]);
+            $("#min-value").text('₹' + ui.values[0]);
+            $("#max-value").text('₹' + ui.values[1]);
         }
     });
 

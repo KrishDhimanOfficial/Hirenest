@@ -13,12 +13,12 @@
                     <%= job.category?.name %>
                 </div>
                 <h4 class="mb-2">
-                    <a class="product__title " href="/job/details<%= job.jobTitle %>">
+                    <a class="product__title " href="/job/details/<%= encodeURIComponent(job.jobTitle) %>">
                         <%= job.jobTitle %>
                     </a>
                 </h4>
             </div>
-            <img src="/uploads/logo/<%= job.companylogo %>" class="figure-img m-0" alt="product_img"
+            <img src="/uploads/logo/<%= job.companylogo %>" class="figure-img m-0" title="<%=  job.companyName %>" alt="<%=  job.companyName %>"
                 style="width: 80px; height: 80px; border-radius: 50%;">
         </div>
         <ul class="d-flex gap-2 p-0" style="list-style: none;">
