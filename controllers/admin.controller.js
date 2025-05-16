@@ -7,6 +7,7 @@ import skillModel from "../models/skill.model.js";
 import userModel from "../models/user.model.js";
 import site_settingsModel from "../models/site_settings.model.js";
 import handleAggregatePagination from "../services/handlepagePagination.js"
+import deleteFile from "../services/deleteFile.js";
 
 const adminControllers = {
     renderDashboard: async (req, res) => {
@@ -118,7 +119,7 @@ const adminControllers = {
     setSiteTerms: async (req, res) => {
         try {
             const { term_condition } = req.body;
-            const response = await site_settingsModel.findByIdAndUpdate({ _id: '6821d1a9b57e33e4ce6ef864' }, { term_condition })
+            const response = await site_settingsModel.findByIdAndUpdate({ _id: '6821d1a9b57e33e4ce6ef864' }, { term_condition: term_condition.trim() })
             if (!response) res.status(400).redirect('/dashboard/setting/term&condition')
             return res.status(200).redirect('/dashboard/setting/term&condition')
         } catch (error) {
@@ -162,6 +163,55 @@ const adminControllers = {
             )
         } catch (error) {
             console.log('renderJobSkills : ' + error.message)
+        }
+    },
+    renderGeneralSettings: async (req, res) => {
+        try {
+            const settings = await site_settingsModel.find({}, { companyname: 1, companyemail: 1, contact: 1 })
+
+            const error = req.session.error;
+            delete req.session.error;
+            return res.render('layout/admin',
+                {
+                    body: '../admin/settings/site_setting',
+                    title: 'Dashboard | Term',
+                    settings: settings[0],
+                    error
+                }
+            )
+        } catch (error) {
+            console.log('renderGeneralSettings : ' + error.message)
+        }
+    },
+    setGeneralSettings: async (req, res) => {
+        try {
+            const { companyname, companyemail, contact, } = req.body;
+
+            if (!companyname || !companyemail || !contact) {
+                req.session.error = 'All fields are required'
+                return res.status(400).redirect('/dashboard/setting/general-settings')
+            }
+            const response = await site_settingsModel.findByIdAndUpdate({ _id: '6821d1a9b57e33e4ce6ef864' }, { companyname, companyemail, contact, logo: req.file.filename })
+            if (req.file.filename) deleteFile(`companylogo/${response.logo}`)
+            if (!response) {
+                req.session.error = 'Something went wrong! Please try again later.'
+                return res.status(400).redirect('/dashboard/setting/general-settings')
+            }
+            return res.status(200).redirect('/dashboard/setting/general-settings')
+        } catch (error) {
+            if (error.name === 'ValidationError') {
+                req.session.error = 'Check Input Fields.'
+                return res.status(400).redirect('/dashboard/setting/general-settings')
+            }
+            console.log('setGeneralSettings : ' + error.message)
+        }
+    },
+    getGeneralSettings: async (req, res) => {
+        try {
+            const settings = await site_settingsModel.find({}, { companyname: 1, companyemail: 1, contact: 1, logo: 1 })
+            return res.status(200).json(settings[0])
+        } catch (error) {
+            console.log('getGeneralSettings : ' + error.message)
         }
     },
 }

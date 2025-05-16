@@ -75,68 +75,71 @@
                     </div>
                 </div>
                 <div class="col-lg-3 order-lg-first">
-                    <div class="shop-sidebar">
-                        <%- console.log('sfger' ,query) %>
-                            <form class="checkout-form"
-                                action="/find/jobs?<%= new URLSearchParams({ query }).toString() %>" method="get">
-                                <input type="text" hidden name="search" value="<%= query.search %>">
-                                <input type="text" hidden name="latest" value="<%= query.latest %>">
-                                <div class="col-12 signup-form">
-                                    <div class="submit-btn">
-                                        <Button id="submitFormBtn" type="submit"
-                                            class="signup-btn btn-1">Submit</Button>
-                                    </div>
+                    <div class="shop-sidebar checkout-form ">
+                        <input type="text" hidden name="search" value="<%= query.search %>">
+                        <input type="text" hidden name="latest" value="<%= query.latest %>">
+                        <div class="sidebar-wrap widget-wrapper bg-transparent p-0">
+                            <div class="sidebar-widget mb-40">
+                                <div class="search-form">
+                                    <form action="#">
+                                        <div class="input-wrap">
+                                            <input type="email" placeholder="Search">
+                                            <button type="submit"><i
+                                                    class="fa-solid fa-magnifying-glass"></i></button>
+                                        </div>
+                                    </form>
                                 </div>
-                                <div class="sidebar-widget mb-40">
-                                    <div class="widget-title mb-15">
-                                        <h4>Categories</h4>
-                                    </div>
-                                    <div class="sidebar_widget-content">
-                                        <div class="categories-accordion">
-                                            <div class="accordion" id="accordionShop">
-                                                <div class="accordion-item mb-10">
-                                                    <button class="accordion-button" type="button"
-                                                        data-bs-toggle="collapse" data-bs-target="#collapseOne"
-                                                        aria-expanded="true" aria-controls="collapseOne">
-                                                        Smart Glass
-                                                    </button>
-                                                    <ul id="collapseOne" class="accordion-collapse collapse show"
-                                                        data-bs-parent="#accordionShop">
-                                                        <li><a href="#">Ai Glass</a></li>
-                                                        <li><a href="#">Digital Glass</a></li>
-                                                        <li><a href="#">5D Gadget</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
+                            </div>
+                        </div>
+                        <div class="sidebar-widget mb-40">
+                            <div class="widget-title mb-15">
+                                <h4>Categories</h4>
+                            </div>
+                            <div class="sidebar_widget-content">
+                                <div class="categories-accordion">
+                                    <div class="accordion" id="accordionShop">
+                                        <div class="accordion-item mb-10">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#collapseOne" aria-expanded="true"
+                                                aria-controls="collapseOne">
+                                                Smart Glass
+                                            </button>
+                                            <ul id="collapseOne" class="accordion-collapse collapse show"
+                                                data-bs-parent="#accordionShop">
+                                                <li><a href="#">Ai Glass</a></li>
+                                                <li><a href="#">Digital Glass</a></li>
+                                                <li><a href="#">5D Gadget</a></li>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="sidebar-widget mb-40">
-                                    <div class="widget-title mb-15">
-                                        <h4>hightlight</h4>
-                                    </div>
-                                    <div class="sidebar_widget-content">
-                                        <ul class="highlight_content">
-                                            <li><a href="#">Promotions (885)</a></li>
-                                            <li><a href="#">New Arrivals (987)</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="sidebar-widget mb-40">
-                                    <div class="widget-title mb-15">
-                                        <h4>Experience</h4>
-                                    </div>
-                                    <div class="sidebar_widget-content">
-                                        <Select name="experience" class="single-input-wrapper">
-                                             <% for( let i=1; i <=15; ++i ) { %>
-                                            <option value="<%= i %>">
-                                                <%= i %> year
-                                            </option>
-                                            <% } %>
-                                        </Select>
-                                    </div>
-                                </div>
-                            </form>
+                            </div>
+                        </div>
+                        <div class="sidebar-widget mb-40">
+                            <div class="widget-title mb-15">
+                                <h4>hightlight</h4>
+                            </div>
+                            <div class="sidebar_widget-content">
+                                <ul class="highlight_content">
+                                    <li><a href="#">Promotions (885)</a></li>
+                                    <li><a href="#">New Arrivals (987)</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="sidebar-widget mb-40">
+                            <div class="widget-title mb-15">
+                                <h4>Experience</h4>
+                            </div>
+                            <div class="sidebar_widget-content">
+                                <Select name="experience" class="single-input-wrapper">
+                                    <% for( let i=1; i <=15; ++i ) { %>
+                                        <option value="<%= i %>">
+                                            <%= i %> year
+                                        </option>
+                                        <% } %>
+                                </Select>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

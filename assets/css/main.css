@@ -1829,7 +1829,6 @@ label {
   display: inline-block;
   position: relative;
   z-index: 99;
-  transform: translateY(-46px);
 }
 
 @media only screen and (max-width: 1200px) {

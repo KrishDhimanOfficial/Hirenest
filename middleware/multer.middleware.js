@@ -51,8 +51,14 @@ export const userInfo = multer({
     fileFilter: filterUserInfo
 })
 
+
 export const companylogo = multer({
     storage: createStorage('logo'),
+    limits: { fileSize: MAX_SIZE },
+    fileFilter: fileFilter
+})
+export const sitelogo = multer({
+    storage: createStorage('companylogo'),
     limits: { fileSize: MAX_SIZE },
     fileFilter: fileFilter
 })

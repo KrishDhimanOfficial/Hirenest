@@ -125,8 +125,25 @@ const usersControllers = {
             const response = await userModel.findByIdAndDelete({ _id: req.user?._id }, { new: true })
             if (!response) return res.status(404).json({ error: 'Not Found.' })
 
-            await deleteFile(`userInfo/${response.image}`)
-            await deleteFile(`userInfo/${response.resume}`)
+
+            if (req.user.isrecuiter) {
+                await Promise.all([
+                    await deleteFile(`userInfo/${response.image}`),
+                    await jobModel.deleteMany({ recuriterId: req.user?._id })
+                ])
+            } else {
+                await Promise.all([
+                    deleteFile(`userInfo/${response.image}`),
+                    deleteFile(`userInfo/${response.resume}`),
+                    userProjectModel.deleteMany({ candidateId: req.user?._id }),
+                    experienceModel.deleteMany({ candidateId: req.user?._id }),
+                    educationModel.deleteMany({ candidateId: req.user?._id }),
+                    Job.updateMany(
+                        { appliedUsersId: response._id }, // only documents where userId exists
+                        { $pull: { appliedUsersId: response._id } } // remove from array
+                    )
+                ])
+            }
             return res.status(200).json({ redirect: '/login' })
         } catch (error) {
             console.log('deleteuserInfo : ' + error.message)

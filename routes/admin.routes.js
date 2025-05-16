@@ -3,10 +3,12 @@ import adminControllers from '../controllers/admin.controller.js'
 import jobAttributesController from '../controllers/job.attributes.controller.js'
 import { isAuthenticated } from '../middleware/authentication.js'
 import passport from 'passport'
-import { upload } from '../middleware/multer.middleware.js'
+import { sitelogo, upload } from '../middleware/multer.middleware.js'
 import usersControllers from '../controllers/users.controller.js'
+import handlemulterError from '../middleware/handleMulterErrors.js'
 const router = express.Router()
 
+router.get('/api/general-settings', adminControllers.getGeneralSettings)
 router.get('/logout', (req, res, next) => {
     req.logout((err) => {
         if (err) return next(err)
@@ -94,6 +96,11 @@ router.delete('/user/:id', usersControllers.deleteuserInfo)
 router.route('/setting/term&condition')
     .get(adminControllers.renderTerms_CondtionPage)
     .post(upload.none(), adminControllers.setSiteTerms)
+
+
+router.route('/setting/general-settings')
+    .get(adminControllers.renderGeneralSettings)
+    .post(sitelogo.single('logo'), handlemulterError, adminControllers.setGeneralSettings)
 
 router.get('/*', (req, res) => res.status(404).render('admin/partials/NotFound', {
     layout: false,

@@ -17,7 +17,7 @@ class Fetch {
     }
 
     async get(endURL, headers, signal) {
-        // console.log('Starting fetch:',endURL)
+        console.log('Starting fetch:',endURL)
         const finalHeaders = {
             ...(headers || {})
         }

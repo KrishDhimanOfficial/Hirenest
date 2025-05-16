@@ -4,14 +4,22 @@ import {
     updateuserexperience, MultiSelectInit, setDatatable, apiInput, updateFilter
 } from './variable.js'
 import Fetch from './fetch.js'
-
 const ImageInput = document.querySelector('#pimage')
+
+const setsetting = async () => {
+    const res = await Fetch.get('/dashboard/api/general-settings')
+    console.log(res)
+    document.querySelector('.companyname').innerHTML = res.companyname;
+    document.querySelectorAll('.logo').forEach(img => img.src = `/uploads/companylogo/${res.logo}`);
+    document.querySelector('.favicon').href = `/uploads/companylogo/${res.logo}`;
+}
+setsetting()
 
 if (document.querySelector('#job-table')) {
     setDatatable()
-        document.querySelector("#filter-field").addEventListener("change", updateFilter)
-        document.querySelector("#filter-type").addEventListener("change", updateFilter)
-        document.querySelector("#filter-value").addEventListener("keyup", updateFilter)
+    document.querySelector("#filter-field").addEventListener("change", updateFilter)
+    document.querySelector("#filter-type").addEventListener("change", updateFilter)
+    document.querySelector("#filter-value").addEventListener("keyup", updateFilter)
 }
 
 if (document.querySelector("#datatable")) $("#datatable").DataTable({
@@ -49,7 +57,7 @@ $(function () {
 })
 
 if ($('#summernote')) $('#summernote').summernote({
-    height: 300, // Set editor height
+    height: 600, // Set editor height
     tooltip: false,
     toolbar: [
         // [groupName, [list of button]]
