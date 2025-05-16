@@ -159,7 +159,7 @@
                     <h4 class="widget-title">Key Skills</h4>
                     <div class="page-pagination justify-content-start flex-wrap">
                         <% job.skills?.forEach(skill=> { %>
-                            <a href="/find-jobs/skill/<%= skill.slug %>" class="p-1" style="width: 90px;">
+                            <a href="/find/jobs?skill=<%= skill.slug %>" class="p-1" style="width: 90px;">
                                 <%= skill.name %>
                             </a>
                             <% }) %>

@@ -27,7 +27,7 @@ router.get('/logout', (req, res, next) => {
     })
 })
 router.route('/login')
-    .get((req, res) => res.render('layout/site', { body: '../site/login', title: 'Login', endApi: 'login' }))
+    .get((req, res) => res.render('layout/site', { body: '../site/login', title: 'Login', endApi: 'login', user: req.user }))
     .post((req, res, next) => {
         passport.authenticate('local', (err, user, info) => {
             if (err) return next(err)
@@ -76,10 +76,12 @@ router.get('/api/job-tags', siteControllers.getTags) // Job Tags
 router.get('/api/job-categories', siteControllers.getcategories) // Job Categories
 router.get('/api/job-degrees', siteControllers.getdegrees) // Job Categories
 
-router.get('/apply/job/:id', jobControllers.applyJob)
 router.get('/find/jobs', siteControllers.renderSearchJobPage)
+router.get('/apply/job/:id', jobControllers.applyJob)
 router.get('/job/saved/:id', jobControllers.updateSavedJobs)
-router.get('/job/details/:job',jobControllers.renderSearchDetails)
+router.get('/job/details/:job', jobControllers.renderSearchDetails)
+router.get('/download/resume/:candidateId/:jobId', usersControllers.downloadResume)
+router.get('/api/filter/applied-job/candidate/:jobId', jobControllers.filterAppliedJobs)
 
 // Project
 router.route('/api/user/project/:id?')
@@ -115,6 +117,10 @@ router.route('/api/recruiter/create-job/:id?')
 router.use('/profile', checkIsCandidate, userProfileRoutes)
 router.use('/recruiter', checkIsRecruiter, recuriterProfileRoutes)
 
+router.get('/404', (req, res) => res.status(404).render('layout/site', {
+    body: '../site/partials/error',
+    title: '404'
+}))
 router.get('/*', (req, res) => res.status(404).render('layout/site', {
     body: '../site/partials/error',
     title: '404'

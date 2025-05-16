@@ -1,12 +1,18 @@
 import {
     Form, Notify, siteForm, TextINput, confirmDeleteBtn, updatetableData, submitFormBtn, datatable, deletebtn,
     handleDeleteRequest, updatetableDataStatus, previewImage, updateuserProject, updateusereducation,
-    updateuserexperience, MultiSelectInit
+    updateuserexperience, MultiSelectInit, setDatatable, apiInput, updateFilter
 } from './variable.js'
 import Fetch from './fetch.js'
 
-const apiInput = document.querySelector('#endapi')
 const ImageInput = document.querySelector('#pimage')
+
+if (document.querySelector('#job-table')) {
+    setDatatable()
+        document.querySelector("#filter-field").addEventListener("change", updateFilter)
+        document.querySelector("#filter-type").addEventListener("change", updateFilter)
+        document.querySelector("#filter-value").addEventListener("keyup", updateFilter)
+}
 
 if (document.querySelector("#datatable")) $("#datatable").DataTable({
     "paging": true,

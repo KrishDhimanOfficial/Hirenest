@@ -160,51 +160,6 @@
         })
     }
 
-    if (jQuery(".testimonial-slider-active-2").length > 0) {
-        let testimonialSlider2 = new Swiper('.testimonial-slider-active-2', {
-            // Optional parameters
-            slidesPerView: 3,
-            slidesPerColumn: 1,
-            paginationClickable: true,
-            loop: true,
-            spaceBetween: 30,
-
-            autoplay: {
-                delay: 2500,
-                disableOnInteraction: false,
-            },
-
-            // If we need pagination
-            pagination: {
-                el: '.swiper-pagination-2',
-                clickable: true,
-            },
-
-            // Navigation arrows
-            navigation: {
-                nextEl: '.testimonial-button-next-2',
-                prevEl: '.testimonial-button-prev-2',
-            },
-
-            a11y: false,
-
-            breakpoints: {
-                320: {
-                    slidesPerView: 1,
-                },
-                768: {
-                    slidesPerView: 1,
-                },
-                992: {
-                    slidesPerView: 2,
-                },
-                1200: {
-                    slidesPerView: 3,
-                },
-            },
-        })
-    }
-
     if (jQuery(".testimonial-slider-active-3").length > 0) {
         let testimonialSlide3 = new Swiper('.testimonial-slider-active-3', {
             // Optional parameters

@@ -1,26 +1,27 @@
 <div class="checkout-section <%= padding ? 'pt-150 pt-lg-120 pb-130 pb-lg-70' : 'px-4 py-0' %>">
     <div class="container">
         <div class="row">
-            <div class="col-12 cart-list-form">
-                <div class="table-responsive">
-                    <table class="table">
-                        <tbody id="table-grid">
+
+                            <% jobs.collectionData?.forEach(job=> { %>
+                                <div class="col-12">
+                                    <% job.showAddListIcon=true %>
+                                        <%- include('../partials/jobCard',{job}) %>
+                                </div>
+                                <% }) %>
                         </tbody>
                     </table>
-                        <!-- // <div class="col-lg-12">
-                             <%# if (projects.totalPages && projects.totalDocs> projects.limit ) { %>
+                     <div class="col-lg-12">
+                             <% if (jobs.totalPages && jobs.totalDocs> jobs.limit ) { %>
                                  <div class="page-pagination justify-content-lg-start justify-content-center">
-                                     <%# for( let i=1; i <=projects.totalDocs; ++i ) { %>
-                                         <a class="<%# projects.page == i ?'active':'' %>"
-                                             href="/profile/<%# user.name %>/projects?page=<%# i %>">
-                                             <%# i %>
+                                     <% for( let i=1; i <=jobs.totalDocs; ++i ) { %>
+                                         <a class="<%= jobs.page == i ?'active':'' %>"
+                                             href="/profile/<%= user.name %>/projects?page=<%= i %>">
+                                             <%= i %>
                                          </a>
-                                         <%# } %>
+                                         <% } %>
                                  </div>
-                                 <%# } %>
-                         </div> -->
-                </div>
-            </div>
+                                 <% } %>
+                         </div>
         </div>
     </div>
 </div>

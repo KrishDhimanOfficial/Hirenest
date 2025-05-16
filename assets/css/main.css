@@ -5321,12 +5321,6 @@ label {
   display: none;
 }
 
-.filter-wrap .filter-dropdown-wrap .filter-dropdown .nice-select .current:after {
-  content: "\f078";
-  font-family: "Font Awesome 6 Pro";
-  margin-left: 7px;
-}
-
 .filter-wrap .filter-dropdown-wrap .filter-dropdown .nice-select .list li {
   color: #505050;
 }

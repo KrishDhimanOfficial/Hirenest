@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -96,18 +97,19 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    
+
     isactive: {
         type: Boolean,
         default: true
     },
-    
+
+    degreeId: { type: mongoose.Schema.Types.ObjectId },
     jobsId: { type: [mongoose.Schema.Types.ObjectId] },
     appliedJobs: { type: [mongoose.Schema.Types.ObjectId] },
     savedJobs: { type: [mongoose.Schema.Types.ObjectId] },
     userprojectIds: { type: [mongoose.Schema.Types.ObjectId] },
-    
+
 }, { timestamps: true })
 
-
+userSchema.plugin(mongooseAggregatePaginate)
 export default mongoose.model('User', userSchema)

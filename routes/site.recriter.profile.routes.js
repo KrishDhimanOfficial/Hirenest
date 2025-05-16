@@ -4,6 +4,7 @@ const router = express.Router()
 
 router.get('/profile', siteControllers.renderRecuriterProfilePage)
 router.get('/profile/dashboard', siteControllers.renderRecuriterDashBoard)
+router.get('/filter/candidates/:jobId?', siteControllers.renderFilterCandidates)
 
 // job
 router.get('/profile/jobs', siteControllers.renderJobsPage)

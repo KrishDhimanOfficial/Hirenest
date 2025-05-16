@@ -1,0 +1,77 @@
+<div class="checkout-section pt-150 pt-lg-120 pb-130 pb-lg-70">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3 offset-9">
+                <% if (locals.error) { %>
+                    <div class="alert alert-error">
+                        <%= error %>
+                    </div>
+                    <% } %>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" id="endapi" value="<%= endApi %>">
+    <div class="container">
+        <div class="row checkout-form">
+            <div class="col-12">
+                <div class="row filter-wrap">
+                    <div class="col-md-12 filter-dropdown-wrap">
+                        <ul class="d-flex gap-3 p-0"  style="list-style: none;">
+                            <li><a href="/recruiter/profile/jobs" class="cart-btn px-2 border-0">Go Back</a></li>
+                        </ul>
+                        <div class="filter-dropdown me-2 ms-auto">
+                            <div class="select-wrap">
+                                <select id="filter-field" class="single-input-wrapper  mb-0">
+                                    <option selected> Field</option>
+                                    <option value="name">Name</option>
+                                    <option value="email">Email</option>
+                                    <option value="phone">Phone</option>
+                                    <option value="state">State</option>
+                                    <option value="city">City</option>
+                                    <option value="degree">Education</option>
+                                    <option value="resumeScore">Skill Match</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="filter-dropdown me-2">
+                            <div class="select-wrap">
+                                <select id="filter-type" class="single-input-wrapper mb-0">
+                                    <option value="=">=</option>
+                                    <option value="<%= '<' %>">
+                                        <%= '<' %>
+                                    </option>
+                                    <option value="<%= '<=' %>">
+                                        <%= '<=' %>
+                                    </option>
+                                    <option value=">">></option>
+                                    <option value=">=">>=</option>
+                                    <option value="!=">!=</option>
+                                    <option value="like">like</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="filter-dropdown me-2">
+                            <div class="select-wrap">
+                                <input id="filter-value" type="text" placeholder="value to filter"
+                                    class="single-input-wrapper  mb-0">
+                            </div>
+                        </div>
+
+                        <button id="filter-clear" class="cart-btn border-0 w-25">Clear Filter</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="filter-title">
+                    <h4>Showing <span id="application-count">0</span> Applications</h4>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div id="job-table"></div>
+                </div>
+            </div>
+        </div>
+    </div>

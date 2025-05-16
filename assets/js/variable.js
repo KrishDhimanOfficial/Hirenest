@@ -6,8 +6,12 @@ export const TextINput = document.querySelector('#TextINput')
 export const siteForm = document.querySelector('#updateFormSite') || document.querySelector('#updateFormSitewithPatch')
 export const confirmDeleteBtn = document.querySelector('#confirmDeleteBtn')
 export const previewImgTag = document.querySelector('#previewImg')
+export const apiInput = document.querySelector('#endapi')
 const stillworkingCheck = document.querySelector('#new-account')
 const hideSalary = document.querySelector('#hideSalary')
+const fieldEl = document.getElementById("filter-field");
+const typeEl = document.getElementById("filter-type");
+const valueEl = document.getElementById("filter-value");
 import Fetch from './fetch.js'
 
 if (stillworkingCheck) stillworkingCheck.onclick = (e) => {
@@ -189,3 +193,97 @@ export const MultiSelectInit = (selector, api) => {
         }
     })
 }
+
+let table = null;
+export const setDatatable = async () => {
+    try {
+        const data = await Fetch.get(`/${apiInput.value.trim()}`)
+        document.querySelector('#application-count').innerHTML = data.collectionData.length;
+
+        return new Promise((resolve) => {
+            table = new Tabulator("#job-table", {
+                data: data.collectionData,  //load row data from array
+                layout: "fitColumns",      //fit columns to width of table
+                responsiveLayout: "hide",  //hide columns that don't fit on the table
+                addRowPos: "top",          //when adding a new row, add it to the top of the table
+                history: true,             //allow undo and redo actions on the table
+                paginationSizeSelector: [5, 10, 15, 20],
+                paginationSize: data.limit,
+                paginationDataSent: {
+                    page: data.page + 1,     // what Tabulator sends
+                    size: data.limit,       // what Tabulator sends
+                },
+                paginationDataReceived: {
+                    last_page: data.totalPages,     // what server returns
+                    data: data.collectionData,                // array of records
+                },
+                paginationCounter: "rows", //display count of paginated rows in footer
+                movableColumns: true,      //allow column order to be changed
+                initialSort: [             //set the initial sort order of the data
+                    { column: "name", dir: "asc" },
+                ],
+                columnDefaults: { tooltip: true, },       //show tool tips on cells 
+                columns: [                 //define the table columns
+                    { title: "Name", field: "name", formatter: (cell) => `<a href='${cell.getRow().getData()?.url}' class="text-dark" target="_blank"> ${cell.getRow().getData()?.name}</a>` },
+                    { title: "Email", field: "email", hozAlign: "left", },
+                    { title: "Phone", field: "phone", },
+                    { title: "Education", field: "degree",formatter: (cell) => `<span> ${cell.getRow().getData()?.degree.name}</span>` },
+                    { title: "State", field: "state", formatter: (cell) => `<span> ${cell.getRow().getData()?.location.state}</span>` },
+                    { title: "City", field: "city", formatter: (cell) => `<span> ${cell.getRow().getData()?.location.city}</span>` },
+                    { title: "Skills Matched", field: "resumeScore", hozAlign: "center", formatter: (cell) => `${Math.round(Math.floor(cell.getValue()))}%`, },
+                    {
+                        title: "DownLoad Resume", field: "action", hozAlign: "center", formatter: function (cell) {
+                            const row = cell.getRow().getData()
+                            return `<a href="/download/resume/${row._id}/${row.jobId}"
+                                                    class="remove-product text-start">
+                                                    Download
+                                    </a>`;
+                        },
+                    },
+                ],
+                tableBuilt: function () { resolve() }
+            })
+        })
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+export function updateFilter(e) {
+    if (!table) {
+        console.warn('Table not initialized yet')
+        return;
+    }
+
+    const filterField = document.querySelector("#filter-field")
+    const filterType = document.querySelector("#filter-type")
+    const filterValue = document.querySelector("#filter-value")
+
+    const filterVal = filterField?.value;
+    const typeVal = filterType?.value;
+    const valueVal = filterValue?.value;
+
+
+    if (!filterVal) {
+        table.clearFilter();
+        return;
+    }
+
+    if (filterVal === "function") {
+        filterType.disabled = true;
+        filterValue.disabled = true;
+        table.clearFilter();
+    } else {
+        filterType.disabled = false;
+        filterValue.disabled = false;
+        table.setFilter(filterVal, typeVal, valueVal);
+    }
+}
+
+if (document.getElementById("filter-clear")) document.getElementById("filter-clear").addEventListener("click", () => {
+    fieldEl.value = "";
+    typeEl.value = "=";
+    valueEl.value = "";
+
+    table.clearFilter();
+})

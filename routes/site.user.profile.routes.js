@@ -8,6 +8,7 @@ router.get('/:name/education', siteControllers.renderUserEducation)
 router.get('/:name/projects', siteControllers.renderUserProjects)
 router.get('/:name/experience', siteControllers.renderUserExperience)
 router.get('/:name/saveJoblist', siteControllers.renderSavedJobList)
+router.get('/:name/appliedJoblist', siteControllers.renderAppliedJobList)
 router.get('/:name', siteControllers.renderUserDashboard)
 
 

@@ -13,6 +13,7 @@ import jobDegreeModel from '../models/job.degree.model.js'
 import jobIndustryTypeModel from '../models/job.industry.type.model.js'
 import mongoose from 'mongoose'
 import jobModel from '../models/job.model.js'
+
 const ObjectId = mongoose.Types.ObjectId;
 
 const siteControllers = {
@@ -33,11 +34,17 @@ const siteControllers = {
     },
     renderHomePage: async (req, res) => {
         try {
+            const [totalJobs, totalrecuriters] = await Promise.all([
+                jobModel.countDocuments({ status: true }),
+                userModel.countDocuments({ isrecuiter: true })
+            ])
+
             return res.render('layout/site',
                 {
                     body: '../site/home',
                     title: 'Home',
-                    user: req.user
+                    user: req.user,
+                    totalJobs, totalrecuriters
                 }
             )
         } catch (error) {
@@ -54,7 +61,7 @@ const siteControllers = {
                     title: `Profile`,
                     subtitle: `Profile - ${req.user?.name}`,
                     endApi: `api/user`,
-                    user: req.user
+                    user: req.user,
                 })
         } catch (error) {
             console.log('renderProfilePage : ' + error.message)
@@ -168,6 +175,7 @@ const siteControllers = {
             const country = req.user?.location.country;
             const state = req.user?.location.state;
             const city = req.user?.location.city;
+            const degrees = await jobDegreeModel.find({ status: true })
 
             const skills = await userModel.aggregate([
                 {
@@ -181,6 +189,7 @@ const siteControllers = {
                 { $unwind: "$skills" },
                 { $replaceRoot: { newRoot: '$skills' } }
             ])
+            
             return res.render('layout/site',
                 {
                     body: '../site/candidate/dashboard',
@@ -189,7 +198,7 @@ const siteControllers = {
                     subtitle: `Profile - ${req.user?.name}`,
                     endApi: `api/user`,
                     user: req.user,
-                    skills,
+                    skills, degrees,
                     country: Country.getCountryByCode(country),
                     state: State.getStateByCodeAndCountry(state, country),
                     city: City.getCitiesOfState(country, state).filter(c => c.name === city)[0]
@@ -336,6 +345,26 @@ const siteControllers = {
         try {
             const pipeline = [
                 {
+                    $match: { _id: req.user?._id }
+                },
+                {
+                    $lookup: {
+                        from: 'jobs',
+                        localField: 'savedJobs',
+                        foreignField: '_id',
+                        as: 'savedJobs'
+                    }
+                },
+                {
+                    $unwind: {
+                        path: '$savedJobs',
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $replaceRoot: { newRoot: '$savedJobs' }
+                },
+                {
                     $lookup: {
                         from: 'job_categories',
                         localField: 'categoryId',
@@ -378,7 +407,9 @@ const siteControllers = {
                     }
                 }
             ]
-            const jobs = await handleAggregatePagination(jobModel, pipeline, req.query)
+            const jobs = await handleAggregatePagination(userModel, pipeline, req.query)
+            console.log(jobs);
+
             return res.render('layout/site',
                 {
                     body: '../site/candidate/dashboard',
@@ -392,6 +423,93 @@ const siteControllers = {
             )
         } catch (error) {
             console.log('renderSavedJobList : ' + error.message)
+        }
+    },
+    renderAppliedJobList: async (req, res) => {
+        try {
+            const pipeline = [
+                {
+                    $match: { _id: req.user?._id }
+                },
+                {
+                    $lookup: {
+                        from: 'jobs',
+                        localField: 'appliedJobs',
+                        foreignField: '_id',
+                        as: 'appliedJobs'
+                    }
+                },
+                {
+                    $unwind: {
+                        path: '$appliedJobs',
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $replaceRoot: { newRoot: '$appliedJobs' }
+                },
+                {
+                    $lookup: {
+                        from: 'job_categories',
+                        localField: 'categoryId',
+                        foreignField: '_id',
+                        as: 'category'
+                    }
+                },
+                {
+                    $unwind: {
+                        path: '$category',
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: 'recuriterId',
+                        foreignField: '_id',
+                        as: 'user'
+                    }
+                },
+                {
+                    $unwind: '$user'
+                },
+                {
+                    $addFields: {
+                        state: '$user.location.state',
+                        country: '$user.location.country',
+                        companylogo: '$user.image'
+                    }
+                },
+                {
+                    $project: {
+                        jobTitle: 1,
+                        'category.name': 1,
+                        state: 1,
+                        country: 1,
+                        experience: 1,
+                        hideSalary: 1,
+                        salary: 1,
+                        companylogo: 1,
+                        shortDesc: 1
+                    }
+                }
+            ]
+            const jobs = await handleAggregatePagination(userModel, pipeline, req.query)
+
+            return res.render('layout/site',
+                {
+                    body: '../site/candidate/dashboard',
+                    profilelayout: './appliedJobs',
+                    title: 'HireNest | Profile',
+                    subtitle: `Profile - ${req.user?.name}`,
+                    user: req.user,
+                    jobs,
+                    getState: State.getStateByCodeAndCountry
+                }
+            )
+        } catch (error) {
+
+            console.log('renderAppliedJobList : ' + error.message)
         }
     },
     renderRecuriterProfilePage: async (req, res) => {
@@ -430,7 +548,6 @@ const siteControllers = {
     },
     renderRecuriterDashBoard: async (req, res) => {
         try {
-
             return res.render('layout/site',
                 {
                     body: '../site/recuriter/dashboard',
@@ -440,6 +557,23 @@ const siteControllers = {
                 })
         } catch (error) {
             console.log('renderRecuriterDashBoard : ' + error.message)
+        }
+    },
+    renderFilterCandidates: async (req, res) => {
+        try {
+            const error = req.session.error;
+            delete req.session.error;
+
+            return res.render('layout/site',
+                {
+                    body: '../site/recuriter/filterCandidate',
+                    profilelayout: '',
+                    title: `Profile - ${req.user?.companyName}`,
+                    user: req.user, error,
+                    endApi: `api/filter/applied-job/candidate/${req.params.jobId}`,
+                })
+        } catch (error) {
+            console.log('renderFilterCandidates : ' + error.message)
         }
     },
     renderJobsPage: async (req, res) => {
@@ -612,7 +746,7 @@ const siteControllers = {
     },
     renderSearchJobPage: async (req, res) => {
         try {
-            const { latest, search, experience } = req.query;
+            const { latest, search, experience, skill } = req.query;
             // console.log('renderSearchJobPage - queryparams :', req.query);
 
             const educationsPipeline = [
@@ -622,13 +756,19 @@ const siteControllers = {
                 { $project: { name: 1, count: 1 } }
             ]
 
+            const matchParameters = {
+                jobTitle: { $regex: search || '', $options: 'i' },
+                status: true
+            }
+
+            if (experience) match.experience = { $lte: parseInt(experience) }
+            if (skill) {
+                const skillId = await skillModel.findOne({ name: { $regex: skill, $options: 'i' } })
+                matchParameters.skills = { $in: [skillId?._id] }
+            }
+
             const pipeline = [
-                {
-                    $match: {
-                        jobTitle: { $regex: search || '', $options: 'i' },
-                        status: true
-                    }
-                },
+                { $match: matchParameters },
                 {
                     $lookup: {
                         from: 'job_categories',
@@ -679,7 +819,6 @@ const siteControllers = {
                 }
             ]
             if (latest) pipeline.push({ $sort: { postDate: 1 } })
-            if (experience) pipeline.push({ $match: { experience: { $lte: parseInt(experience) } } })
 
             const [jobs, educations] = await Promise.all([
                 handleAggregatePagination(jobModel, pipeline, req.query),

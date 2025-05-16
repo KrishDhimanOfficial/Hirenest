@@ -8,6 +8,8 @@ import deleteFile from '../services/deleteFile.js'
 import ZipFile from "../services/ZipFile.js";
 import experienceModel from "../models/experience.model.js";
 import educationModel from "../models/education.model.js"
+import path from 'path'
+import config from "../config/config.js"
 const ObjectId = mongoose.Types.ObjectId;
 const validateId = mongoose.Types.ObjectId.isValid;
 
@@ -49,7 +51,7 @@ const usersControllers = {
     },
     updateuserInfo: async (req, res) => {
         try {
-            const { name, phone, gender, address, skills, country, state, city, bio, url } = req.body;
+            const { name, phone, gender, address, skills, country, state, degreeId, city, bio, url } = req.body;
 
             if (skills.length > 10) return res.status(400).json({ info: "Skills can't be more than 10" })
             if (!name || !phone || !gender || !address || !country || !state || !city || !bio || !url) {
@@ -61,7 +63,8 @@ const usersControllers = {
             const docToBeupdate = {
                 name, phone, gender,
                 location: { address, country, state, city },
-                bio, url
+                bio, url,
+                degreeId: new ObjectId(degreeId)
             }
 
             if (req.files['image']) docToBeupdate.image = req.files['image'][0].filename
@@ -76,8 +79,8 @@ const usersControllers = {
 
             if (!response) return res.status(404).json({ error: 'Something went wrong, please try again later.' })
 
-            await deleteFile(`userInfo/${response.image}`)
-            await deleteFile(`userInfo/${response.resume}`)
+            if (req.files['image']) await deleteFile(`userInfo/${response.image}`)
+            if (req.files['resume']) await deleteFile(`userInfo/${response.resume}`)
             ZipFile(req, res) // Zip the pdf file
 
             return res.status(200).json({ redirect: `/profile/${req.user?.name}` })
@@ -305,7 +308,6 @@ const usersControllers = {
     },
     createEducation: async (req, res) => {
         try {
-
             const { courseName, specializedField, schoolORUniversity, startDate, endDate, description } = req.body;
 
             const checkExstence = await educationModel.findOne({ courseName })
@@ -421,6 +423,27 @@ const usersControllers = {
             return res.status(200).json({ redirect: '/login' })
         } catch (error) {
             console.log('deleteRecuirterInfo : ' + error.message)
+        }
+    },
+    downloadResume: async (req, res) => {
+        try {
+            if (!validateId(req.params.candidateId) || !validateId(req.params.jobId)) {
+                req.session.error = 'Something went wrong! Please try again later.'
+                return res.status(400).redirect(`/recruiter/filter/candidates/${req.params.jobId}`)
+            }
+
+            const candidate = await userModel.findById({ _id: req.params.candidateId })
+            const filePath = path.join(path.dirname(config.siteURL), `../uploads/userInfo/${candidate.resume}`); // full path to ZIP file
+
+            // This will send the ZIP file as a download with the default filename
+            return res.download(filePath, 'resume.zip', (err) => {
+                if (err) {
+                    req.session.error = 'Something went wrong! Please try again later.'
+                    return res.status(400).redirect(`/recruiter/filter/candidates/${req.params.jobId}`)
+                }
+            })
+        } catch (error) {
+            console.log('downloadResume : ' + error.message)
         }
     },
 }

@@ -3,7 +3,8 @@ import validate from "../services/validate.js";
 import jobModel from "../models/job.model.js";
 import { parseISO } from "date-fns";
 import userModel from "../models/user.model.js";
-import { State } from "country-state-city";
+import { City, State } from "country-state-city";
+import handleAggregatePagination from "../services/handlepagePagination.js";
 const validateId = mongoose.Types.ObjectId.isValid;
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -148,24 +149,11 @@ const jobControllers = {
                         as: 'category'
                     }
                 },
-                {
-                    $unwind: {
-                        path: '$category',
-                        preserveNullAndEmptyArrays: true
-                    }
-                },
+                { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
                 {
                     $project: {
-                        jobTitle: 1,
-                        'category.name': 1,
-                        state: 1,
-                        country: 1,
-                        experience: 1,
-                        hideSalary: 1,
-                        salary: 1,
-                        companylogo: 1,
-                        shortDesc: 1,
-                        companyName: 1
+                        jobTitle: 1, 'category.name': 1, state: 1, country: 1, experience: 1,
+                        hideSalary: 1, salary: 1, companylogo: 1, shortDesc: 1, companyName: 1
                     }
                 }
             ]
@@ -270,7 +258,9 @@ const jobControllers = {
                 jobModel.aggregate(jobpipeline),
                 jobModel.aggregate(relevantJobspipeline).limit(7).sort({ postDate: 1 })
             ])
-            if (!job) return res.status(404).redirect('/find/jobs')
+            console.log(job, relevantJobs);
+
+            if (job.length === 0) return res.status(404).redirect('/404')
 
             const error = req.session.error;
             const success = req.session.success;
@@ -315,6 +305,94 @@ const jobControllers = {
             return res.status(200).redirect(`/job/details/${job.jobTitle}`)
         } catch (error) {
             console.log('applyJob : ' + error.message)
+        }
+    },
+    filterAppliedJobs: async (req, res) => {
+        try {
+            const job = await jobModel.findById({ _id: req.params.jobId }, { skills: 1 })
+            const pipeline = [
+                {
+                    $match: {
+                        isrecuiter: false,
+                        appliedJobs: {
+                            $in: [new ObjectId(req.params.jobId)]
+                        }
+                    },
+                },
+                {
+                    $lookup: {
+                        from: 'degrees',
+                        localField: 'degreeId',
+                        foreignField: '_id',
+                        as: 'degree'
+                    }
+                },
+                {
+                    $unwind: {
+                        path: '$degree',
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $addFields: {
+                        jobId: req.params.jobId, // used for redirect when resume downloading fails
+                        resumeScore: {
+                            $cond: [
+                                { $gt: [job.skills.length, 0] }, // prevent division by zero
+                                {
+                                    $multiply: [
+                                        {
+                                            $divide: [
+                                                {
+                                                    $size: {
+                                                        $filter: {
+                                                            input: {
+                                                                $map: {
+                                                                    input: "$skills", // resume skills from DB
+                                                                    as: "s",
+                                                                    in: { $toLower: { $toString: "$$s" } } // ensure lowercase string
+                                                                }
+                                                            },
+                                                            as: "resumeSkill",
+                                                            cond: {
+                                                                $in: [
+                                                                    "$$resumeSkill",
+                                                                    job.skills.map(s => s.toString().toLowerCase()) // lowercase array from JS
+                                                                ]
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                job.skills.length
+                                            ]
+                                        },
+                                        100
+                                    ]
+                                },
+                                0
+                            ]
+                        },
+                    }
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        name: 1,
+                        email: 1,
+                        phone: 1,
+                        jobId: 1,
+                        resumeScore: 1,
+                        'degree.name': 1,
+                        'location.state': 1,
+                        'location.country': 1,
+                        'location.city': 1
+                    }
+                }
+            ]
+            const candidates = await handleAggregatePagination(userModel, pipeline, req.query)
+            return res.status(200).json(candidates)
+        } catch (error) {
+            console.log('filterAppliedJobs : ' + error.message)
         }
     },
 }
