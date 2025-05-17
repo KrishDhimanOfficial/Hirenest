@@ -138,7 +138,8 @@ const jobControllers = {
                             {
                                 jobTitle: { $ne: req.params.job }
                             },
-                        ]
+                        ],
+                        approved: true
                     }
                 },
                 {
@@ -258,7 +259,6 @@ const jobControllers = {
                 jobModel.aggregate(jobpipeline),
                 jobModel.aggregate(relevantJobspipeline).limit(7).sort({ postDate: 1 })
             ])
-            console.log(job, relevantJobs);
 
             if (job.length === 0) return res.status(404).redirect('/404')
 
@@ -393,6 +393,22 @@ const jobControllers = {
             return res.status(200).json(candidates)
         } catch (error) {
             console.log('filterAppliedJobs : ' + error.message)
+        }
+    },
+
+    approveJob: async (req, res) => {
+        try {
+            if (!validateId(req.params.id)) return res.status(400).json({ error: 'Invalid Request.' })
+            const { status } = req.body;
+
+            const response = await jobModel.findByIdAndUpdate({ _id: req.params.id },
+                { approved: status },
+                { new: true, runValidators: true }
+            )
+            if (!response) return res.status(400).json({ error: 'Something went wrong, please try again later.' })
+            return res.status(200).json({ success: 'updated successfully.' })
+        } catch (error) {
+            console.log('approveJob : ' + error.message)
         }
     },
 }

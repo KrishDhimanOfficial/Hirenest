@@ -26,7 +26,21 @@ const sitesettingschema = new mongoose.Schema({
     },
     term_condition: {
         type: mongoose.Schema.Types.String
-    }
+    },
+    aboutTitle: {
+        type: String,
+        required: [true, 'Company Name is required!'],
+        match: [/^[A-Za-z\s]{1,30}$/, 'Name must be 1-30 characters and only letters/spaces.'],
+        trim: true,
+    },
+    desc: { type: String, },
+    chooseus_title: {
+        type: String,
+        required: [true, 'Company Name is required!'],
+        match: [/^[A-Za-z\s]{1,30}$/, 'Name must be 1-30 characters and only letters/spaces.'],
+        trim: true,
+    },
+    chooseus_desc: { type: String, }
 })
 
 export default mongoose.model('site_settings', sitesettingschema)

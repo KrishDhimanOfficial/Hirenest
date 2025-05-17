@@ -8,13 +8,46 @@ import userModel from "../models/user.model.js";
 import site_settingsModel from "../models/site_settings.model.js";
 import handleAggregatePagination from "../services/handlepagePagination.js"
 import deleteFile from "../services/deleteFile.js";
+import jobModel from "../models/job.model.js";
+import { Country, State } from "country-state-city";
 
 const adminControllers = {
     renderDashboard: async (req, res) => {
         try {
+
+            const [totalJobs, totalrecuriters, totalcandidates, totalusers, totalSignups] = await Promise.all([
+                jobModel.countDocuments({ status: true }),
+                userModel.countDocuments({ isrecuiter: true, isactive: true }),
+                userModel.countDocuments({ isrecuiter: false, isactive: true }),
+                userModel.countDocuments({ role: { $ne: 'admin' } }),
+                userModel.aggregate([
+                    { $match: { role: { $ne: 'admin' } } },
+                    {
+                        $group: {
+                            _id: {
+                                year: { $year: "$createdAt" },
+                                month: { $month: "$createdAt" }
+                            },
+                            count: { $sum: 1 }
+                        }
+                    },
+                    {
+                        $sort: {
+                            "_id.year": -1,
+                            "_id.month": -1
+                        }
+                    }
+                ])
+            ])
+            console.log(totalSignups);
+
+
             return res.render('layout/admin', {
                 title: 'Hirenest | Dashboard',
                 body: '../admin/dashboard',
+                totalJobs, totalrecuriters,
+                totalcandidates, totalusers,
+                totalSignups: JSON.stringify(totalSignups)
             })
         } catch (error) {
             console.log('renderDashboard : ' + error.message)
@@ -212,6 +245,107 @@ const adminControllers = {
             return res.status(200).json(settings[0])
         } catch (error) {
             console.log('getGeneralSettings : ' + error.message)
+        }
+    },
+    renderAboutusSetting: async (req, res) => {
+        try {
+            const settings = await site_settingsModel.find({}, { aboutTitle: 1, desc: 1, chooseus_title: 1, chooseus_desc: 1 })
+
+            const error = req.session.error;
+            delete req.session.error;
+            return res.render('layout/admin',
+                {
+                    body: '../admin/aboutus/aboutus',
+                    title: 'Dashboard | About us',
+                    error, settings: settings[0],
+                }
+            )
+        } catch (error) {
+            console.log('renderAboutusSetting : ' + error.message)
+        }
+    },
+    setAboutSettings: async (req, res) => {
+        try {
+            const { aboutTitle, desc, chooseus_title, chooseus_desc } = req.body;
+
+            if (!aboutTitle || !desc || !chooseus_title || !chooseus_desc) {
+                req.session.error = 'All fields are required'
+                return res.status(400).redirect('/dashboard/aboutus')
+            }
+            const response = await site_settingsModel.findByIdAndUpdate({ _id: '6821d1a9b57e33e4ce6ef864' }, { aboutTitle, desc, chooseus_title, chooseus_desc })
+
+            if (!response) {
+                req.session.error = 'Something went wrong! Please try again later.'
+                return res.status(400).redirect('/dashboard/aboutus')
+            }
+            return res.status(200).redirect('/dashboard/aboutus')
+        } catch (error) {
+            if (error.name === 'ValidationError') {
+                req.session.error = 'Check Input Fields.'
+                return res.status(400).redirect('/dashboard/aboutus')
+            }
+            console.log('setAboutSettings : ' + error.message)
+        }
+    },
+    renderJobApproval: async (req, res) => {
+        try {
+            const jobs = await jobModel.aggregate([
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: 'recuriterId',
+                        foreignField: '_id',
+                        as: 'user'
+                    }
+                },
+                {
+                    $unwind: {
+                        path: '$user',
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'job_categories',
+                        localField: 'categoryId',
+                        foreignField: '_id',
+                        as: 'category'
+                    }
+                },
+                {
+                    $unwind: {
+                        path: '$category',
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        jobTitle: 1,
+                        'category.name': 1,
+                        'user.companyName': 1,
+                        'user.location': 1,
+                        approved: 1
+                    }
+                }
+            ])
+
+            return res.render('layout/admin',
+                {
+                    body: '../admin/jobs/sitejobs',
+                    title: 'Dashboard | Job Approval',
+                    endApi: 'dashboard/job-approval',
+                    jobs, getState: State.getStateByCodeAndCountry,
+                    getCountry: Country.getCountryByCode
+                }
+            )
+        } catch (error) {
+            console.log('renderJobApproval : ' + error.message)
+            return res.status(500).render('layout/admin', {
+                body: '../admin/error',
+                title: 'Error',
+                error: 'An error occurred while fetching job approvals'
+            })
         }
     },
 }

@@ -1,13 +1,12 @@
 <div class="row">
     <div class="col-md-3 col-sm-6 col-12">
         <div class="info-box">
-            <span class="info-box-icon bg-info elevation-1"><i class="fas fa-cog"></i></span>
+            <span class="info-box-icon bg-info elevation-1"><i class="fa-solid fa-suitcase"></i></span>
 
             <div class="info-box-content">
-                <span class="info-box-text">CPU Traffic</span>
+                <span class="info-box-text">Total Jobs</span>
                 <span class="info-box-number">
-                    10
-                    <small>%</small>
+                    <%= totalJobs %>
                 </span>
             </div>
             <!-- /.info-box-content -->
@@ -17,11 +16,13 @@
     <!-- /.col -->
     <div class="col-md-3 col-sm-6 col-12">
         <div class="info-box mb-3">
-            <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-thumbs-up"></i></span>
+            <span class="info-box-icon bg-danger elevation-1"><i class="fa-solid fa-users"></i></span>
 
             <div class="info-box-content">
-                <span class="info-box-text">Likes</span>
-                <span class="info-box-number">41,410</span>
+                <span class="info-box-text">Total Users</span>
+                <span class="info-box-number">
+                    <%= totalusers %>
+                </span>
             </div>
             <!-- /.info-box-content -->
         </div>
@@ -30,11 +31,13 @@
     <!-- /.col -->
     <div class="col-md-3 col-sm-6 col-12">
         <div class="info-box mb-3">
-            <span class="info-box-icon bg-success elevation-1"><i class="fas fa-shopping-cart"></i></span>
+            <span class="info-box-icon bg-success elevation-1"><i class="fa-solid fa-users"></i></span>
 
             <div class="info-box-content">
-                <span class="info-box-text">Sales</span>
-                <span class="info-box-number">760</span>
+                <span class="info-box-text">Total Recruiter</span>
+                <span class="info-box-number">
+                    <%= totalrecuriters %>
+                </span>
             </div>
             <!-- /.info-box-content -->
         </div>
@@ -46,8 +49,10 @@
             <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-users"></i></span>
 
             <div class="info-box-content">
-                <span class="info-box-text">New Members</span>
-                <span class="info-box-number">2,000</span>
+                <span class="info-box-text">Total Candidates</span>
+                <span class="info-box-number">
+                    <%= totalcandidates %>
+                </span>
             </div>
             <!-- /.info-box-content -->
         </div>
@@ -55,3 +60,78 @@
     </div>
     <!-- /.col -->
 </div>
+<div class="row">
+    <div class="col-md-6">
+
+        <input type="hidden" class="totalusers" value="<%=  totalusers %>">
+        <input type="hidden" class="totalcandidates" value="<%=  totalcandidates %>">
+        <input type="hidden" class="totalrecuriters" value="<%=  totalrecuriters %>">
+        <div class="card card-danger">
+            <div class="card-header">
+                <h3 class="card-title">Active Users</h3>
+
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <canvas id="donutChart"
+                    style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+            </div>
+            <!-- /.card-body -->
+        </div>
+    </div>
+    <div class="col-md-6">
+        <!-- LINE CHART -->
+        <input type="text" hidden class="totalSignups" value="<%= totalSignups %>">
+        <div class="card card-info">
+            <div class="card-header">
+                <h3 class="card-title">Monthly Signups</h3>
+
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart">
+                    <canvas id="lineChart"
+                        style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                </div>
+            </div>
+            <!-- /.card-body -->
+        </div>
+    </div>
+</div>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <table id="datatable" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>Skill</th>
+                                    <th>Is Visible</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-grid">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

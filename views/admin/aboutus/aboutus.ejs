@@ -1,0 +1,62 @@
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-md-6">
+                <h1 class="mb-2">Site Settings</h1>
+                <ol class="breadcrumb float-sm-left">
+                    <li class="breadcrumb-item"><a href="/dashboard">Home</a></li>
+                    <li class="breadcrumb-item active">About us</li>
+                </ol>
+            </div>
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <form action="/dashboard/aboutus" method="post" enctype="multipart/form-data">
+                        <div class="card-body">
+                            <% if (locals.error) { %>
+                                <div class="alert alert-error">
+                                    <%= error %>
+                                </div>
+                                <% } %>
+                                    <div class="mb-3">
+                                        <div class="form-group">
+                                            <label for="aboutTitle">Aboutus Title</label>
+                                            <input type="text" class="form-control" id="aboutTitle" name="aboutTitle"
+                                                value="<%= settings.aboutTitle %>" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="desc">Aboutus Description</label>
+                                            <textarea placeholder="description" id="summernote" name="desc"
+                                                spellcheck="false"><%= settings.desc %></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-group">
+                                            <label for="chooseus_title">Chooseus Title</label>
+                                            <input type="text" class="form-control" id="chooseus_title" name="chooseus_title"
+                                                value="<%= settings.chooseus_title %>" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="chooseus_desc">Chooseus Description</label>
+                                            <textarea placeholder="description" id="summernote2" name="chooseus_desc"
+                                                spellcheck="false"><%= settings.chooseus_desc %></textarea>
+                                        </div>
+                                    </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

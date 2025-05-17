@@ -8744,7 +8744,7 @@ label {
 .course-category-wrap {
   padding: 40px 16px;
   background: #f8fafa;
-  box-shadow: 5px 15px 45px 0px rgba(22, 27, 45, 0.05);
+  box-shadow: 5px 15px 45px 23px rgb(33 39 58 / 8%);
   border-radius: 6px;
   -webkit-transition: all 0.3s linear 0s;
   -moz-transition: all 0.3s linear 0s;

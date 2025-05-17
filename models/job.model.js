@@ -113,6 +113,10 @@ const jobSchema = new mongoose.Schema({
         type: Number,
         required: [true, 'Jobs Opening is required']
     },
+    approved: {
+        type: Boolean,
+        default: false
+    },
     recuriterId: {
         type: mongoose.Schema.Types.ObjectId,
         unquie: true

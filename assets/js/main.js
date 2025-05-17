@@ -8,10 +8,19 @@ const ImageInput = document.querySelector('#pimage')
 
 const setsetting = async () => {
     const res = await Fetch.get('/dashboard/api/general-settings')
-    console.log(res)
-    document.querySelector('.companyname').innerHTML = res.companyname;
-    document.querySelectorAll('.logo').forEach(img => img.src = `/uploads/companylogo/${res.logo}`);
-    document.querySelector('.favicon').href = `/uploads/companylogo/${res.logo}`;
+    const companyNameElement = document.querySelector('.companyname');
+    const contactElement = document.querySelector('.contact');
+    const emailElement = document.querySelector('.email');
+    const logoElements = document.querySelectorAll('.logo');
+    const faviconElement = document.querySelector('.favicon');
+
+    if (companyNameElement) companyNameElement.innerHTML = res.companyname;
+    if (contactElement) contactElement.innerHTML = res.contact;
+    if (emailElement) emailElement.innerHTML = res.companyemail;
+    if (logoElements.length > 0) {
+        logoElements.forEach(img => img.src = `/uploads/companylogo/${res.logo}`);
+    }
+    if (faviconElement) faviconElement.href = `/uploads/companylogo/${res.logo}`;
 }
 setsetting()
 
@@ -57,6 +66,18 @@ $(function () {
 })
 
 if ($('#summernote')) $('#summernote').summernote({
+    height: 600, // Set editor height
+    tooltip: false,
+    toolbar: [
+        // [groupName, [list of button]]
+        ['style', ['style']],
+        ['font', ['bold', 'italic', 'underline', 'clear']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        ['insert', ['link',]],
+        ['view', ['fullscreen', 'codeview', 'help']]
+    ],
+})
+if ($('#summernote2')) $('#summernote2').summernote({
     height: 600, // Set editor height
     tooltip: false,
     toolbar: [
@@ -358,3 +379,96 @@ $('#jobDegree').on('select2:open', function () {
 
 MultiSelectInit('#jobskills', '/api/job-skills?skill')
 MultiSelectInit('#jobTags', '/api/job-tags?tag')
+
+// Doughnut Chart
+var donutChartCanvas = $('#donutChart').get(0).getContext('2d')
+var donutData = {
+    labels: [
+        'Recuiters',
+        'Users',
+        'Job Seekers',
+    ],
+    datasets: [
+        {
+            data: [
+                parseInt($('.totalrecuriters').val()),
+                parseInt($('.totalusers').val()),
+                parseInt($('.totalcandidates').val())
+            ],
+            backgroundColor: ['#f56954', '#00a65a', '#f39c12',],
+        }
+    ]
+}
+
+var donutOptions = {
+    maintainAspectRatio: false,
+    responsive: true,
+}
+
+new Chart(donutChartCanvas, {
+    type: 'doughnut',
+    data: donutData,
+    options: donutOptions
+})
+
+// Line chart
+const signups = JSON.parse($('.totalSignups').val())
+var labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
+// Initialize data array with 0s
+var signupData = new Array(labels.length).fill(0)
+
+// Fill in the signup counts in the correct month index
+signups.forEach(signup => {
+    const monthIndex = signup._id.month - 1; // Convert 1-based month to 0-based index
+    if (monthIndex >= 0 && monthIndex < labels.length) {
+        signupData[monthIndex] = signup.count;
+    }
+})
+
+var areaChartData = {
+    labels,
+    datasets: [
+        {
+            label: 'Digital Goods',
+            backgroundColor: 'rgba(60,141,188,0.9)',
+            borderColor: 'rgba(60,141,188,0.8)',
+            pointRadius: false,
+            pointColor: '#3b8bba',
+            pointStrokeColor: 'rgba(60,141,188,1)',
+            pointHighlightFill: '#fff',
+            pointHighlightStroke: 'rgba(60,141,188,1)',
+            data: signupData
+        },
+    ]
+}
+
+var areaChartOptions = {
+    maintainAspectRatio: false,
+    responsive: true,
+    legend: { display: false },
+    scales: {
+        xAxes: [{
+            gridLines: { display: false }
+        }],
+        yAxes: [{
+            gridLines: { display: false }
+        }]
+    }
+}
+
+
+//-------------
+//- LINE CHART -
+//--------------
+var lineChartCanvas = $('#lineChart').get(0).getContext('2d')
+var lineChartOptions = $.extend(true, {}, areaChartOptions)
+var lineChartData = $.extend(true, {}, areaChartData)
+lineChartData.datasets[0].fill = false;
+lineChartOptions.datasetFill = false
+
+new Chart(lineChartCanvas, {
+    type: 'line',
+    data: lineChartData,
+    options: lineChartOptions
+})

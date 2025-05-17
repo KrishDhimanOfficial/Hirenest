@@ -36,194 +36,67 @@
         </div>
     </div>
     <!-- hero end -->
-
-    <!-- Categories start -->
     <div class="categories-section-2 pt-150 pb-120 pt-lg-120 pb-lg-90 pt-md-80 pb-md-50 pt-xs-50 pb-xs-20">
         <div class="container">
             <div class="row text-center">
                 <div class="col-xl-12">
                     <div class="section-title mb-50">
-                        <div class="sub-title mb-10">
-                            <p>Top Categories</p>
-                        </div>
                         <div class="title">
-                            <h2>Explore Our Courses</h2>
+                            <h2>Explore Top Skills</h2>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="row row-cols-xl-5 row-cols-lg-3 row-cols-md-2 row-cols-1 text-center justify-content-center">
-                <div class="col">
-                    <div class="course-category-wrap">
-                        <div class="icon">
-                            <img src="assets/img/icon/bag.svg" alt="icon">
+                <% skillJobs.forEach(skillJob=> { %>
+                    <% if (skillJob.count> 0) { %>
+                        <div class="col">
+                            <div class="course-category-wrap">
+                                <div class="content">
+                                    <h4>
+                                        <a href="/find/jobs?skill=<%= skillJob.slug %>">
+                                            <%= skillJob.name %>
+                                        </a>
+                                    </h4>
+                                    <p>(<%= skillJob.count %>) Jobs</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="content">
-                            <h4>
-                                <a href="#">Account & Business</a>
-                            </h4>
-                            <p>263+ Course Available</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="course-category-wrap">
-                        <div class="icon">
-                            <img src="assets/img/icon/document.svg" alt="icon">
-                        </div>
-                        <div class="content">
-                            <h4>
-                                <a href="#">Certificat Course</a>
-                            </h4>
-                            <p>350+ Course Available</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="course-category-wrap">
-                        <div class="icon">
-                            <img src="assets/img/icon/camera.svg" alt="icon">
-                        </div>
-                        <div class="content">
-                            <h4>
-                                <a href="#">Photography</a>
-                            </h4>
-                            <p>250+ Course Available</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="course-category-wrap">
-                        <div class="icon">
-                            <img src="assets/img/icon/volume-up.svg" alt="icon">
-                        </div>
-                        <div class="content">
-                            <h4>
-                                <a href="#">Audio Book</a>
-                            </h4>
-                            <p>260+ Course Available</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="course-category-wrap">
-                        <div class="icon">
-                            <img src="assets/img/icon/category.svg" alt="icon">
-                        </div>
-                        <div class="content">
-                            <h4>
-                                <a href="#">Management</a>
-                            </h4>
-                            <p>300+ Course Available</p>
-                        </div>
-                    </div>
-                </div>
+                        <% } %>
+                            <% }) %>
             </div>
         </div>
     </div>
-    <!-- Categories end -->
-
     <!-- About start -->
-    <div class="about-section-2 pb-150 pb-lg-120 pb-md-80 pb-xs-50">
+    <div class="about-section-2 pt-180 pb-150 pb-lg-120 pb-md-80 pb-xs-50">
         <div class="container">
             <div class="row align-items-center justify-content-center">
-                <div class="col-xl-6 col-lg-6 col-md-9 mb-lg-50 mb-md-50 mb-xs-50">
+                <div class="col-xl-6 col-lg-6 mb-lg-50 mb-md-50 mb-xs-50">
                     <div class="about-img-wrapper-2">
                         <div class="about-main-img">
-                            <img src="assets/img/about/about-2.png" alt="main img">
-                        </div>
-                        <div class="about-img-2 d-none d-xl-inline-block">
-                            <img src="assets/img/about/about-3.jpg" alt="thumb">
-                        </div>
-                        <div class="experience-box text-center">
-                            <div class="text-content text-start mb-10">
-                                <span><img src="assets/img/icon/experience.svg" alt="icon"></span>
-                                <h4>25
-                                    Years</h4>
-                            </div>
-                            <h6>Working Exprience</h6>
-                        </div>
-                        <div class="happy-student-count-box">
-                            <div class="student-avatar">
-                                <img src="assets/img/about/studeet-thumb.jpg" alt="thumb">
-                            </div>
-                            <div class="inner-content">
-                                <h6>Happy Students</h6>
-                                <p>From Last 7 Days</p>
-                            </div>
-                            <div class="counter-wrapper">
-                                <div class="bubble-dot"></div>
-                                <div class="number">
-                                    <h6 class="odometer">00</h6>
-                                </div>
-                                <span class="count-mark">k+</span>
-                            </div>
+                            <img src="/assets/img/aboutus.jpg" loading="lazy" alt="main img">
                         </div>
                         <div class="shape-4 d-none d-xl-inline-block">
-                            <img src="assets/img/shape/half-round-2.svg" alt="shape">
                         </div>
-                        <div class="shape-5">
-                            <img src="assets/img/shape/horn-2.svg" alt="shape">
-                        </div>
-                        <div class="bubble-1"></div>
+                        <div class="bubble-1 d-none d-xl-inline-block"></div>
                         <div class="bubble-2 d-none d-xl-inline-block"></div>
                     </div>
                 </div>
                 <div class="col-xl-6 col-lg-6">
-                    <div class="about-content-2">
-                        <div class="section-title">
-                            <div class="sub-title mb-10">
-                                <p>About Us</p>
-                            </div>
-                            <div class="title">
-                                <h2>
-                                    We Provide Best Online
-                                    Education Course
-                                </h2>
-                            </div>
+                    <div class="about-content-2 " data-aos="fade-left">
+                        <div class="sub-title">
+                            <p>About Us</p>
+                        </div>
+                        <div class="title">
+                            <h2>
+                                <%= settings.aboutTitle %>
+                            </h2>
                         </div>
                         <div class="description">
                             <p>
-                                On the other hand, we denounce with righteous indignation and dislike men who
-                                are so
-                                beguiled and demoralized by the charms of pleasure.
+                                <%- settings.desc %>
                             </p>
-                        </div>
-                        <div class="about-box-wrap">
-                            <div class="about-box">
-                                <div class="icon">
-                                    <a href="#">
-                                        <i class="fa-solid fa-shield-check"></i>
-                                    </a>
-                                </div>
-                                <h3 class="title">
-                                    Build Your Career
-                                </h3>
-                                <div class="text">
-                                    <p>
-                                        Online Course Quickly
-                                        From Anywhere
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="about-box">
-                                <div class="icon">
-                                    <a href="#">
-                                        <i class="fa-solid fa-star"></i>
-                                    </a>
-                                </div>
-                                <h3 class="title">Grow Your Skills</h3>
-                                <div class="text">
-                                    <p>
-                                        Online Course Quickly
-                                        From Anywhere
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="theme-btn">
-                            <a href="about-us.html">Learn More</a>
                         </div>
                     </div>
                 </div>
@@ -258,8 +131,7 @@
                 <div class="col-xl-3 col-md-6">
                     <div class="counter-wrap-2 justify-content-xl-start justify-content-center mb-50">
                         <div class="icon">
-                            <!-- <img src="assets/img/icon/document-w.svg" alt="icon"> -->
-                             <i class="fa-solid fa-user text-white"></i>
+                            <i class="fa-solid fa-user text-white"></i>
                         </div>
                         <!-- user -->
                         <div class="counter-info">
@@ -278,14 +150,17 @@
                 <div class="col-xl-3 col-md-6">
                     <div class="counter-wrap-2 justify-content-xl-start justify-content-center mb-50">
                         <div class="icon">
+                            <i class="fa-solid fa-user text-white"></i>
                         </div>
                         <div class="counter-info">
                             <div class="number">
-                                <h3 class="odometer" data-count="32,500">00</h3>
+                                <h3 class="odometer" data-count="<%= totalcandidates %>">
+                                    <%= totalcandidates %>
+                                </h3>
                             </div>
                             <div class="counter-info-divider mt-15 mb-15"></div>
                             <div class="text">
-                                <p>Services Download</p>
+                                <p>Total Job Seekers</p>
                             </div>
                         </div>
                     </div>
@@ -293,14 +168,16 @@
                 <div class="col-xl-3 col-md-6">
                     <div class="counter-wrap-2 justify-content-xl-start justify-content-center mb-50">
                         <div class="icon">
+                            <i class="fa-solid fa-user text-white"></i>
                         </div>
                         <div class="counter-info">
                             <div class="number">
-                                <h3><span class="odometer" data-count="32">00</span>K</h3>
+                                <h3><span class="odometer" data-count="<%= totalusers %>">
+                                        <%= totalusers %>
                             </div>
                             <div class="counter-info-divider mt-15 mb-15"></div>
                             <div class="text">
-                                <p>Best Awards</p>
+                                <p>Total Users</p>
                             </div>
                         </div>
                     </div>
@@ -310,103 +187,68 @@
     </div>
     <!-- Counter end -->
 
-    <!-- FAQ start -->
-    <div class="faq-section-2 pt-80 pb-80 pt-xs-50 pb-xs-50">
+    <!-- Choose  start -->
+    <div class="choose-section-3 overflow-hidden pt-80 pb-80 pt-xs-50 pb-xs-50">
         <div class="container">
-            <div class="faq-wrapper-2">
-                <div class="row align-items-center">
-                    <div class="col-xl-5 col-lg-6 text-xl-start text-center mb-lg-50 mb-md-50 mb-xs-50">
-                        <div class="faq-thumb">
-                            <div class="faq-thumb-1">
-                                <img src="assets/img/faq/faq-1.jpg" alt="thumb">
+            <div class="row align-items-center justify-content-center">
+                <div class="col-xl-6 col-lg-6">
+                    <div class="about-us-choose-content">
+                        <div class="section-title">
+                            <div class="sub-title mb-10">
+                                <p>Why Choose Us</p>
                             </div>
-                            <div class="faq-thumb-2 d-none d-xl-inline-block">
-                                <img src="assets/img/shape/half-round-1.svg" alt="shape">
+                            <div class="title">
+                                <h2>
+                                    <%= settings.chooseus_title %>
+                                </h2>
                             </div>
-                            <div class="student-thumbs d-none d-xl-inline-block">
-                                <h4>1000+ Happy
-                                    Students</h4>
-                                <div class="student-thumbs-box">
-                                    <span> <img src="assets/img/chose/st-1.jpg" alt="thumb"> </span>
-                                    <span><img src="assets/img/chose/st-2.jpg" alt="thumb"></span>
-                                    <span><img src="assets/img/chose/st-3.jpg" alt="thumb"></span>
-                                    <span><img src="assets/img/chose/st-4.jpg" alt="thumb"></span>
-                                    <span class="add-more"><i class="fa-solid fa-plus"></i></span>
-                                </div>
+                        </div>
+                        <div class="text">
+                            <p> <%- settings.chooseus_desc %>
+                            </p>
+                        </div>
+                        <div class="choose-btn-2">
+                            <div class="theme-btn">
+                                <a href="/signup">Get Started</a>
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-7 col-lg-6">
-                        <div class="faq-content-wrap-2">
-                            <div class="section-title mb-20">
-                                <div class="sub-title mb-10">
-                                    <p>Frequently Asked Question</p>
-                                </div>
-                                <div class="title">
-                                    <h2>Have Your Any Question?</h2>
-                                </div>
-                            </div>
-                            <div class="ext-text mb-30">
-                                <p>Discover FAQ From Our Support</p>
-                            </div>
-                            <div class="faq-accordion" id="accordionExample">
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header">
-                                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                            data-bs-target="#collapseOne" aria-expanded="true"
-                                            aria-controls="collapseOne">
-                                            How Can I Pay?
-                                        </button>
-                                    </h2>
-                                    <div id="collapseOne" class="accordion-collapse collapse show"
-                                        data-bs-parent="#accordionExample">
-                                        <div class="accordion-body">
-                                            Objectively our their are many of passage cleaning the
-                                            services
-                                            multimedia based of network.
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button"
-                                            data-bs-toggle="collapse" data-bs-target="#collapseTwo"
-                                            aria-expanded="false" aria-controls="collapseTwo">
-                                            What Is Process To Get Expert Team?
-                                        </button>
-                                    </h2>
-                                    <div id="collapseTwo" class="accordion-collapse collapse"
-                                        data-bs-parent="#accordionExample">
-                                        <div class="accordion-body">
-                                            Objectively our their are many of passage cleaning the
-                                            services
-                                            multimedia based of network.
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button"
-                                            data-bs-toggle="collapse" data-bs-target="#collapseThree"
-                                            aria-expanded="false" aria-controls="collapseThree">
-                                            How Does About Online Services?
-                                        </button>
-                                    </h2>
-                                    <div id="collapseThree" class="accordion-collapse collapse"
-                                        data-bs-parent="#accordionExample">
-                                        <div class="accordion-body">
-                                            Objectively our their are many of passage cleaning the
-                                            services
-                                            multimedia based of network.
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                </div>
+                <div class="col-xl-6 col-lg-6 text-center mt-md-50 mt-xs-50">
+                    <div class="choose-3-thumb">
+                        <div class="thumb" style="width: 100%;height: 100%;">
+                            <img src="/assets/img/aboutus-2.jpg" alt="thumb" style="border-radius: 10%;">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- FAQ end -->
+    <!-- Choose  end -->
+    <div class="partner-section-2 pt-150 pb-150 pt-lg-120 pb-lg-120 pt-md-80 pb-md-80 pt-xs-50 pb-xs-50">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="section-title text-center mb-50 aos-init aos-animate" data-aos="fade-up"
+                        data-aos-delay="200">
+                        <div class="sub-title mb-10">
+                            <p>Top Companies</p>
+                        </div>
+                        <div class="title">
+                            <h2>Trusted by 100+ Company</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <% companies.forEach(company=> { %>
+                    <div class="col-md-2">
+                        <div class="brand-item">
+                            <img src="/uploads/logo/<%= company.image %>" loading="lazy"
+                                style="width: 150px; height: 150px; border-radius: 50%;" alt="thumb">
+                        </div>
+                    </div>
+                    <% }) %>
+            </div>
+        </div>
 </main>

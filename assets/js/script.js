@@ -4,7 +4,7 @@
 
     /*-------------------------------------------
         off-canvas-menu
-    --------------------------------------------- */
+    --------------------------------------------- */              // Call the init() method to start the WOW.js library
 
     $('.off-canvas-menu .has-dropdown').prepend('<span class="toggle-btn"><i class="icon"></i></span>');
 

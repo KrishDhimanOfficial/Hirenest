@@ -1,6 +1,7 @@
 import express from 'express'
 import adminControllers from '../controllers/admin.controller.js'
 import jobAttributesController from '../controllers/job.attributes.controller.js'
+import jobController from '../controllers/job.controller.js'
 import { isAuthenticated } from '../middleware/authentication.js'
 import passport from 'passport'
 import { sitelogo, upload } from '../middleware/multer.middleware.js'
@@ -97,19 +98,22 @@ router.route('/setting/term&condition')
     .get(adminControllers.renderTerms_CondtionPage)
     .post(upload.none(), adminControllers.setSiteTerms)
 
+// Job Approval
+router.route('/job-approval/:id?')
+    .get(adminControllers.renderJobApproval)
+    .patch(jobController.approveJob)
 
 router.route('/setting/general-settings')
     .get(adminControllers.renderGeneralSettings)
     .post(sitelogo.single('logo'), handlemulterError, adminControllers.setGeneralSettings)
 
+router.route('/aboutus')
+    .get(adminControllers.renderAboutusSetting)
+    .post(upload.none(), adminControllers.setAboutSettings)
+
 router.get('/*', (req, res) => res.status(404).render('admin/partials/NotFound', {
     layout: false,
     title: '404'
 }))
-
-
-// router.use((err, req, res, next) => {
-//     return res.status(404).redirect('/dashboard/login')
-// })
 
 export default router

@@ -1,0 +1,72 @@
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-md-6">
+                <h1 class="mb-2">Job Approval</h1>
+                <ol class="breadcrumb float-sm-left">
+                    <li class="breadcrumb-item"><a href="/dashboard">Home</a></li>
+                    <li class="breadcrumb-item active">Job Approval</li>
+                </ol>
+            </div>
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <table id="datatable" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>Job</th>
+                                    <th>Role</th>
+                                    <th>Company</th>
+                                    <th>Location</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-grid">
+                                <% jobs.forEach((job ,i)=> { %>
+                                    <tr>
+                                        <td>
+                                            <%= i+1 %>
+                                        </td>
+                                        <td>
+                                            <%= job.category.name %>
+                                        </td>
+                                        <td>
+                                            <%= job.jobTitle %>
+                                        </td>
+                                        <td>
+                                            <%= job.user.companyName %>
+                                        </td>
+                                        <td>
+                                            <%= getState(job.user?.location.state ,job.user?.location.country).name %>,
+                                            <%= getCountry(job.user?.location.country).name %>
+                                        </td>
+                                        <td>
+                                            <label class="switch">
+                                                <input type="checkbox" data-id="<%=  job._id %>" class="status rowId" <%=
+                                                    job.status ? 'checked' :'' %> >
+                                                <span class="slider"></span>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<input type="hidden" id="endapi" value="<%= endApi %>">
+<!-- Modal -->

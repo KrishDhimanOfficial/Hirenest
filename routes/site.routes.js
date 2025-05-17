@@ -12,6 +12,7 @@ const router = express.Router()
 
 
 router.get('/', siteControllers.renderHomePage)
+router.get('/aboutus',siteControllers.renderAboutPage)
 router.get('/terms&condition', siteControllers.renderTermsPage)
 router.route('/signup')
     .get((req, res) => res.render('layout/site', { body: '../site/signup', title: 'Signup', endApi: 'signup' }))
@@ -70,7 +71,7 @@ router.get('/api/countries', siteControllers.getCounteries)
 router.get('/api/states', siteControllers.getStates)
 router.get('/api/cities', siteControllers.getcities)
 
-
+// Job API
 router.get('/api/job-skills', siteControllers.getSkills) // Job skills
 router.get('/api/job-tags', siteControllers.getTags) // Job Tags
 router.get('/api/job-categories', siteControllers.getcategories) // Job Categories
@@ -104,11 +105,13 @@ router.route('/api/user/education/:id?')
     .put(upload.none(), usersControllers.updateEducation)
     .delete(usersControllers.deleteEducation)
 
+// Recruiter
 router.route('/api/recruiter')
     .put(companylogo.single('image'), handlemulterError, usersControllers.updateRecruiterInfo)
     .patch(upload.none(), usersControllers.changeRecuriterPassword)
     .delete(usersControllers.deleteRecuirterInfo)
 
+// Job CRUD 
 router.route('/api/recruiter/create-job/:id?')
     .post(upload.none(), jobControllers.createJob)
     .put(upload.none(), jobControllers.updateJob)

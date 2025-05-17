@@ -34,21 +34,59 @@ const siteControllers = {
     },
     renderHomePage: async (req, res) => {
         try {
-            const [totalJobs, totalrecuriters] = await Promise.all([
+            const [totalJobs, totalrecuriters, totalcandidates, totalusers, settings, skillJobs, companies] = await Promise.all([
                 jobModel.countDocuments({ status: true }),
-                userModel.countDocuments({ isrecuiter: true })
+                userModel.countDocuments({ isrecuiter: true }),
+                userModel.countDocuments({ isrecuiter: false }),
+                userModel.countDocuments({ role: { $ne: 'admin' } }),
+                await site_settingsModel.find({}, { aboutTitle: 1, desc: 1, chooseus_title: 1, chooseus_desc: 1 }),
+                await skillModel.aggregate([
+                    {
+                        $lookup: {
+                            from: 'jobs',
+                            localField: '_id',
+                            foreignField: 'skills',
+                            as: 'jobs'
+                        }
+                    },
+                    { $addFields: { count: { $size: '$jobs' } } },
+                    { $sort: { count: -1 } },
+                    { $limit: 5 },
+                    { $project: { name: 1, count: 1, slug: 1 } }
+                ]),
+                await userModel.find({ isrecuiter: true }, { image: 1 })
             ])
+
 
             return res.render('layout/site',
                 {
                     body: '../site/home',
                     title: 'Home',
                     user: req.user,
-                    totalJobs, totalrecuriters
+                    totalJobs, totalrecuriters,
+                    totalcandidates, totalusers,
+                    settings: settings[0],
+                    skillJobs, companies
                 }
             )
         } catch (error) {
             console.log('renderHomePage : ' + error.message)
+        }
+    },
+    renderAboutPage: async (req, res) => {
+        try {
+            const settings = await site_settingsModel.find({}, { aboutTitle: 1, desc: 1, chooseus_title: 1, chooseus_desc: 1 })
+
+            return res.render('layout/site',
+                {
+                    body: '../site/aboutus',
+                    title: 'About us',
+                    user: req.user,
+                    settings: settings[0]
+                }
+            )
+        } catch (error) {
+            console.log('renderAboutPage : ' + error.message)
         }
     },
     renderProfilePage: async (req, res) => {
@@ -189,7 +227,7 @@ const siteControllers = {
                 { $unwind: "$skills" },
                 { $replaceRoot: { newRoot: '$skills' } }
             ])
-            
+
             return res.render('layout/site',
                 {
                     body: '../site/candidate/dashboard',
@@ -758,7 +796,8 @@ const siteControllers = {
 
             const matchParameters = {
                 jobTitle: { $regex: search || '', $options: 'i' },
-                status: true
+                status: true,
+                approved: true
             }
 
             if (experience) match.experience = { $lte: parseInt(experience) }
